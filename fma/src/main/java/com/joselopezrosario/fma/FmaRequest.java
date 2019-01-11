@@ -1,6 +1,7 @@
 package com.joselopezrosario.fma;
 
 
+import android.net.Uri;
 import android.support.annotation.Nullable;
 
 import java.util.ArrayList;
@@ -27,8 +28,9 @@ public class FmaRequest {
     private String token;
     private String limit;
     private String offset;
-    private ArrayList<FmaParamPortal> fmaParamPortalParams;
-    private ArrayList<FmaParamSort> fmaParamSortParams;
+    private ArrayList<FmaParamPortal> fmaParamPortal;
+    private ArrayList<FmaParamSort> fmaParamSort;
+    private FmaParamScript fmaParamScript;
     private String message;
     private Boolean success;
 
@@ -114,7 +116,7 @@ public class FmaRequest {
             return this;
         }
         if (this.method.equals(GET)) {
-            return buildGet(this.endpoint, this.layout, this.limit, this.offset, this.fmaParamSortParams, this.fmaParamPortalParams);
+            return buildGet(this.endpoint, this.layout, this.limit, this.offset, this.fmaParamSort, this.fmaParamPortal, this.fmaParamScript);
         } else {
             // TODO: Handle POST, PATCH, DELETE
             return null;
@@ -134,7 +136,8 @@ public class FmaRequest {
                                 @Nullable String limit,
                                 @Nullable String offset,
                                 @Nullable ArrayList<FmaParamSort> fmaParamSortArrayList,
-                                @Nullable ArrayList<FmaParamPortal> fmaParamPortalArrayList) {
+                                @Nullable ArrayList<FmaParamPortal> fmaParamPortalArrayList,
+                                @Nullable FmaParamScript fmaParamScript) {
         /*------------------------------------------------------------------------------------------
         Build the URL parameters (limit/offset, sort, portal, and script params).
         ------------------------------------------------------------------------------------------*/
@@ -167,7 +170,6 @@ public class FmaRequest {
             sortParams = "_sort=[" + android.text.TextUtils.join(",", sortParamsArray) + "]";
             paramsArray.add(sortParams);
         }
-        // &_sort=[{ "fieldName": "field-name", "sortOrder": "sort-order" }, { ... }]
         /*------------------------------------------------------------------------------------------
         Build the portal parameters
         ------------------------------------------------------------------------------------------*/
@@ -194,6 +196,44 @@ public class FmaRequest {
             portalParams = "portal=[" + android.text.TextUtils.join(",", portalNames) + "]" + portalOptionalParams;
             paramsArray.add(portalParams);
         }
+        /*------------------------------------------------------------------------------------------
+        Build the script parameters
+        ------------------------------------------------------------------------------------------*/
+        StringBuilder scriptParams = new StringBuilder();
+        if (fmaParamScript != null){
+            String script = fmaParamScript.getScript();
+            String scriptParam = fmaParamScript.getScriptParam();
+            String preRequest = fmaParamScript.getPreRequest();
+            String preRequestParam = fmaParamScript.getPreRequestParam();
+            String preSort = fmaParamScript.getPreSort();
+            String preSortParam = fmaParamScript.getPreSortParam();
+            String layoutResponse = fmaParamScript.getLayoutReponse();
+            if (script != null) {
+                scriptParams = scriptParams.append("&script").append("=").append(Uri.encode(script));
+            }
+            if (scriptParam != null) {
+                scriptParams = scriptParams.append("&script.param").append("=").append(Uri.encode(scriptParam));
+            }
+            if (preRequest != null) {
+                scriptParams = scriptParams.append("&script.prerequest").append("=").append(Uri.encode(preRequest));
+            }
+            if (preRequestParam != null) {
+                scriptParams = scriptParams.append("&script.prerequest.param").append("=").append(Uri.encode(preRequestParam));
+            }
+            if (preSort != null) {
+                scriptParams = scriptParams.append("&script.presort").append("=").append(Uri.encode(preSort));
+            }
+            if (preSortParam != null) {
+                scriptParams = scriptParams.append("&script.presort.param").append("=").append(Uri.encode(preSortParam));
+            }
+            if (layoutResponse != null) {
+                scriptParams = scriptParams.append("&layout.response").append("=").append(Uri.encode(layoutResponse));
+            }
+            paramsArray.add(scriptParams.toString());
+        }
+        /*------------------------------------------------------------------------------------------
+        Build the final params
+        ------------------------------------------------------------------------------------------*/
         if (paramsArray.size() > 0) {
             params = "?" + android.text.TextUtils.join("&", paramsArray);
         }
@@ -236,14 +276,20 @@ public class FmaRequest {
     }
 
     public FmaRequest setPortalParams(ArrayList<FmaParamPortal> fmaParamPortalArrayList) {
-        this.fmaParamPortalParams = fmaParamPortalArrayList;
+        this.fmaParamPortal = fmaParamPortalArrayList;
         return this;
     }
 
     public FmaRequest setSortParams(ArrayList<FmaParamSort> fmaParamSortArrayList) {
-        this.fmaParamSortParams = fmaParamSortArrayList;
+        this.fmaParamSort = fmaParamSortArrayList;
         return this;
     }
+
+    public FmaRequest setScriptPrams(FmaParamScript fmaParamSortArrayList) {
+        this.fmaParamScript = fmaParamSortArrayList;
+        return this;
+    }
+
 
     /* ---------------------------------------------------------------------------------------------
     Private setters

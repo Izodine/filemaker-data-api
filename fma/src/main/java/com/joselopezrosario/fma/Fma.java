@@ -93,8 +93,7 @@ public final class Fma {
             JSONObject fmResponse = new JSONObject(x).getJSONObject("response");
             JSONArray fmMessages = new JSONObject(x).getJSONArray("messages");
             response.setFmResponse(fmResponse);
-            response.setFmMessages(fmMessages);
-            response.setOk(true);
+            response.setFmMessageArray(fmMessages);
         } catch (JSONException e) {
             e.printStackTrace();
         }

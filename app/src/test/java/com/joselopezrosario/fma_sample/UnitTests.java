@@ -3,6 +3,7 @@ package com.joselopezrosario.fma_sample;
 import com.joselopezrosario.fma.Fma;
 import com.joselopezrosario.fma.FmaData;
 import com.joselopezrosario.fma.FmaParamPortal;
+import com.joselopezrosario.fma.FmaParamScript;
 import com.joselopezrosario.fma.FmaRecord;
 import com.joselopezrosario.fma.FmaRequest;
 import com.joselopezrosario.fma.FmaResponse;
@@ -113,7 +114,7 @@ public class UnitTests {
         FmaData data = new FmaData().create(response);
         FmaRecord record = data.getRecord(0);
         FmaRecord portalRecord = record.getPortalRecord(LAYOUT_VGSALES, 0);
-        assert paseVgSales(portalRecord);
+        assert parseVgSales(portalRecord);
     }
 
     @Test
@@ -141,7 +142,51 @@ public class UnitTests {
         }
         FmaData data = new FmaData().create(response);
         FmaRecord record = data.getRecord(0);
-        assert paseVgSales(record);
+        assert parseVgSales(record);
+    }
+
+    @Test
+    public void getRecordsRunScript() {
+        FmaParamScript script = new FmaParamScript()
+                .setScript("log").setScriptParam("Hello from script")
+                .setPreRequest("log").setPreRequestParam("Hello from pre-request script")
+                .setPreSort("log").setPreSortParam("Hello from pre-sort script")
+                .setLayoutReponse(LAYOUT_VGSALES);
+        FmaRequest request = new FmaRequest()
+                .getRecords(ENDPOINT, token, LAYOUT_VGSALES)
+                .setLimit(10)
+                .setOffset(1)
+                .setScriptPrams(script)
+                .disableSSL(true)
+                .build();
+        if (!request.isOk()) {
+            assert false;
+            return;
+        }
+        FmaResponse response = Fma.execute(request);
+        if (!response.isOk()) {
+            assert false;
+            return;
+        }
+        // Get the script error and result responses
+        int scriptError = response.getScriptError();
+        String scriptResult = response.getScriptResult();
+        int scriptErrorPreRequest = response.getScriptErrorPreRequest();
+        String scriptResultPreRequest = response.getScriptResultPreRequest();
+        int scriptErrorPreSort = response.getScriptErrorPreSort();
+        String scriptResultPreSort = response.getScriptResultPreSort();
+
+        FmaData data = new FmaData().create(response);
+        FmaRecord record = data.getRecord(0);
+        boolean parsed = parseVgSales(record);
+
+        assert parsed
+                && scriptError == 0
+                && scriptResult.equals("Ok")
+                && scriptErrorPreRequest == 0
+                && scriptResultPreRequest.equals("Ok")
+                && scriptErrorPreSort == 0
+                && scriptResultPreSort.equals("Ok");
     }
 
     @AfterClass
@@ -163,7 +208,7 @@ public class UnitTests {
 
     }
 
-    private static boolean paseVgSales(FmaRecord record) {
+    private static boolean parseVgSales(FmaRecord record) {
         String recordId = record.getRecordId();
         String modId = record.getModId();
         String rank = record.getValue("Rank");
@@ -182,7 +227,7 @@ public class UnitTests {
             return false;
         } else if (publisher == null) {
             return false;
-        }else{
+        } else {
             return true;
         }
 
