@@ -3,9 +3,6 @@ package com.joselopezrosario.fma;
 
 import android.support.annotation.Nullable;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import java.util.ArrayList;
 
 public class FmaRequest {
@@ -30,20 +27,20 @@ public class FmaRequest {
     private String token;
     private String limit;
     private String offset;
-    private ArrayList<FmaPortalParams> fmaPortalParamsParams;
-    private ArrayList<FmaSortParams> fmaSortParamsParams;
+    private ArrayList<FmaParamPortal> fmaParamPortalParams;
+    private ArrayList<FmaParamSort> fmaParamSortParams;
     private String message;
     private Boolean success;
 
     public FmaRequest() {
-        this.layout = null;
-        this.limit = null;
-        this.offset = null;
-        this.fmaSortParamsParams = null;
-        this.fmaPortalParamsParams = null;
-        this.success = false;
-        this.accountName = null;
-        this.password = null;
+        this.setLayout(null);
+        this.setOffset(1);
+        this.setLimit(100);
+        this.setSortParams(null);
+        this.setPortalParams(null);
+        this.setOk(false);
+        this.setAccountName(null);
+        this.setPassword(null);
         this.disableSSL(false);
     }
 
@@ -116,29 +113,28 @@ public class FmaRequest {
         if (this.fmMethod.equals(LOGIN) || this.fmMethod.equals(LOGOUT)) {
             return this;
         }
-        if ( this.method.equals(GET)){
-            return buildGet(this.endpoint, this.layout, this.limit, this.offset, this.fmaSortParamsParams, this.fmaPortalParamsParams);
-        } else{
+        if (this.method.equals(GET)) {
+            return buildGet(this.endpoint, this.layout, this.limit, this.offset, this.fmaParamSortParams, this.fmaParamPortalParams);
+        } else {
             // TODO: Handle POST, PATCH, DELETE
             return null;
         }
     }
 
     /**
-     *
-     * @param endpoint the FileMaker Data API endpoint (ex: https://host/fmi/data/v1/databases/MyDatabase)
-     * @param layout   the layout from where to retrieve the records
-     * @param limit the maximum number of records that should be returned
-     * @param offset the record number of the first record in the range of records
-     * @param fmaSortParamsArrayList an ArrayList of sort parameter objects
-     * @param fmaPortalParamsArrayList an ArrayList of portal parameter objects
+     * @param endpoint                 the FileMaker Data API endpoint (ex: https://host/fmi/data/v1/databases/MyDatabase)
+     * @param layout                   the layout from where to retrieve the records
+     * @param limit                    the maximum number of records that should be returned
+     * @param offset                   the record number of the first record in the range of records
+     * @param fmaParamSortArrayList   an ArrayList of sort parameter objects
+     * @param fmaParamPortalArrayList an ArrayList of portal parameter objects
      * @return
      */
     private FmaRequest buildGet(String endpoint, String layout,
                                 @Nullable String limit,
                                 @Nullable String offset,
-                                @Nullable ArrayList<FmaSortParams> fmaSortParamsArrayList,
-                                @Nullable ArrayList<FmaPortalParams> fmaPortalParamsArrayList) {
+                                @Nullable ArrayList<FmaParamSort> fmaParamSortArrayList,
+                                @Nullable ArrayList<FmaParamPortal> fmaParamPortalArrayList) {
         /*------------------------------------------------------------------------------------------
         Build the URL parameters (limit/offset, sort, portal, and script params).
         ------------------------------------------------------------------------------------------*/
@@ -156,30 +152,36 @@ public class FmaRequest {
         /*------------------------------------------------------------------------------------------
         Build the sort parameters
         ------------------------------------------------------------------------------------------*/
-        // TODO: Handle the sort parameters
-        //StringBuilder sortParams = new StringBuilder();
-        /*try {
-            FmaSortParams sort = fmaSortParamsArrayList.get(0);
-            JSONObject o = new JSONObject();
-            o.put("fieldName", sort.getFieldName());
-            o.put("sortOrders",sort.getSortOrder());
-        } catch (JSONException e){
-            e.printStackTrace();
-        }*/
+        String sortParams = "";
+        if (fmaParamSortArrayList != null) {
+            int countSortParams = fmaParamSortArrayList.size();
+            String[] sortParamsArray = new String[countSortParams];
+            int i = 0;
+            while (countSortParams > i) {
+                FmaParamSort fmaSortParam = fmaParamSortArrayList.get(i);
+                String fieldName = fmaSortParam.getFieldName();
+                String sortOrder = fmaSortParam.getSortOrder();
+                sortParamsArray[i] = "{\"fieldName\":" + "\"" + fieldName + "\",\"sortOrder\":" + "\"" + sortOrder + "\"}";
+                i++;
+            }
+            sortParams = "_sort=[" + android.text.TextUtils.join(",", sortParamsArray) + "]";
+            paramsArray.add(sortParams);
+        }
+        // &_sort=[{ "fieldName": "field-name", "sortOrder": "sort-order" }, { ... }]
         /*------------------------------------------------------------------------------------------
         Build the portal parameters
         ------------------------------------------------------------------------------------------*/
         String portalParams = "";
-        if (fmaPortalParamsArrayList != null) {
+        if (fmaParamPortalArrayList != null) {
             StringBuilder portalOptionalParams = new StringBuilder();
-            int count = fmaPortalParamsArrayList.size();
-            String[] portalNames = new String[count];
+            int countPortalParams = fmaParamPortalArrayList.size();
+            String[] portalNames = new String[countPortalParams];
             int i = 0;
-            while (count > i) {
-                FmaPortalParams fmaPortalParams = fmaPortalParamsArrayList.get(i);
-                String portalName = fmaPortalParams.getName();
-                String portalLimit = fmaPortalParams.getLimit();
-                String portalOffset = fmaPortalParams.getOffset();
+            while (countPortalParams > i) {
+                FmaParamPortal fmaParamPortal = fmaParamPortalArrayList.get(i);
+                String portalName = fmaParamPortal.getName();
+                String portalLimit = fmaParamPortal.getLimit();
+                String portalOffset = fmaParamPortal.getOffset();
                 portalNames[i] = "\"" + portalName + "\"";
                 if (portalLimit != null) {
                     portalOptionalParams = portalOptionalParams.append("&_limit.").append(portalName).append("=").append(portalLimit);
@@ -189,9 +191,9 @@ public class FmaRequest {
                 }
                 i++;
             }
-            portalParams = "portal=[" + android.text.TextUtils.join(", ", portalNames) + "]" + portalOptionalParams;
+            portalParams = "portal=[" + android.text.TextUtils.join(",", portalNames) + "]" + portalOptionalParams;
+            paramsArray.add(portalParams);
         }
-        paramsArray.add(portalParams);
         if (paramsArray.size() > 0) {
             params = "?" + android.text.TextUtils.join("&", paramsArray);
         }
@@ -233,13 +235,13 @@ public class FmaRequest {
         return this;
     }
 
-    public FmaRequest setFmaPortalParamsParams(ArrayList<FmaPortalParams> fmaPortalParamsArrayList) {
-        this.fmaPortalParamsParams = fmaPortalParamsArrayList;
+    public FmaRequest setPortalParams(ArrayList<FmaParamPortal> fmaParamPortalArrayList) {
+        this.fmaParamPortalParams = fmaParamPortalArrayList;
         return this;
     }
 
-    public FmaRequest setFmaSortParamsParams(ArrayList<FmaSortParams> fmaSortParamsArrayList) {
-        this.fmaSortParamsParams = fmaSortParamsArrayList;
+    public FmaRequest setSortParams(ArrayList<FmaParamSort> fmaParamSortArrayList) {
+        this.fmaParamSortParams = fmaParamSortArrayList;
         return this;
     }
 
