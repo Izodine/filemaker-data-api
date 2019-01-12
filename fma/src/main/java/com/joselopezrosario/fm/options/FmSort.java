@@ -1,12 +1,12 @@
-package com.joselopezrosario.fma;
+package com.joselopezrosario.fm.options;
 
-public class FmaParamSort {
+public class FmSort {
     private static String ASC = "ascend";
     private static String DESC = "descend";
     private String fieldName;
     private String sortOrder;
 
-    public FmaParamSort(String fieldName) {
+    public FmSort(String fieldName) {
         this.setFieldName(fieldName);
         this.ascend();
     }
@@ -25,19 +25,19 @@ public class FmaParamSort {
     /* ---------------------------------------------------------------------------------------------
     Public setters
     ----------------------------------------------------------------------------------------------*/
-    public FmaParamSort ascend() {
+    public FmSort ascend() {
         this.sortOrder = ASC;
         return this;
     }
 
-    public FmaParamSort descend() {
+    public FmSort descend() {
         this.sortOrder = DESC;
         return this;
     }
     /* ---------------------------------------------------------------------------------------------
     Private setters
     ----------------------------------------------------------------------------------------------*/
-    private FmaParamSort setFieldName(String fieldName) {
+    private FmSort setFieldName(String fieldName) {
         this.fieldName = fieldName;
         return this;
     }

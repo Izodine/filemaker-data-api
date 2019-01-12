@@ -1,4 +1,4 @@
-package com.joselopezrosario.fma;
+package com.joselopezrosario.fm;
 
 import android.annotation.SuppressLint;
 import android.net.Uri;
@@ -28,26 +28,28 @@ import javax.net.ssl.SSLSession;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
-public final class Fma {
+public final class Fm {
 
-    public static FmaResponse execute(FmaRequest fmaRequest) {
-        return processExecute(fmaRequest);
+    public static FmResponse execute(FmRequest fmRequest) {
+        return processExecute(fmRequest);
     }
 
     /**
      * processExecute
      * Connect to the FileMaker Server, send the request, and retrieve the result
      *
-     * @param request an FmaRequest object
-     * @return an FmaResponse object
+     * @param request an FmRequest object
+     * @return an FmResponse object
      */
-    private static FmaResponse processExecute(FmaRequest request) {
+    private static FmResponse processExecute(FmRequest request) {
         String url = request.getEndpoint();
         String method = request.getMethod();
         String body = request.getBody();
         String auth = getAuthString(request);
-        disableSSL();
-        FmaResponse response = new FmaResponse();
+        if ( request.isSSLDisabled()){
+            disableSSL();
+        }
+        FmResponse response = new FmResponse();
         HttpsURLConnection urlConnection;
         BufferedReader reader = null;
         urlConnection = buildUrlConnection(
@@ -128,7 +130,7 @@ public final class Fma {
             e.printStackTrace();
             return null;
         }
-        if (method.equals(FmaRequest.GET)) {
+        if (method.equals(FmRequest.GET)) {
             return urlConnection;
         }
         urlConnection.setDoOutput(true);
@@ -145,15 +147,15 @@ public final class Fma {
     /**
      * getAuthString
      *
-     * @param request an FmaRequest object
+     * @param request an FmRequest object
      * @return for Basic Auth, "Basic " + the Base64 encoded credentials; for Bearer Auth, "Bearer " + token.
      */
-    private static String getAuthString(FmaRequest request) {
+    private static String getAuthString(FmRequest request) {
         switch (request.getAuth()) {
-            case FmaRequest.BASIC:
-                return FmaRequest.BASIC + " " + encodeFileMakerCredentials(request.getAccountName(), request.getPassword());
-            case FmaRequest.BEARER:
-                return FmaRequest.BEARER + " " + request.getToken();
+            case FmRequest.BASIC:
+                return FmRequest.BASIC + " " + encodeFileMakerCredentials(request.getAccountName(), request.getPassword());
+            case FmRequest.BEARER:
+                return FmRequest.BEARER + " " + request.getToken();
             default:
                 return null;
         }

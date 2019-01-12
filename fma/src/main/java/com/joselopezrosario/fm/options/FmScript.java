@@ -1,6 +1,6 @@
-package com.joselopezrosario.fma;
+package com.joselopezrosario.fm.options;
 
-public class FmaParamScript {
+public class FmScript {
     private String script;
     private String scriptParam;
     private String preRequest;
@@ -9,44 +9,44 @@ public class FmaParamScript {
     private String preSortParam;
     private String layoutReponse;
 
-    public FmaParamScript() {
+    public FmScript() {
     }
 
     /*----------------------------------------------------------------------------------------------
     Public setters
     ----------------------------------------------------------------------------------------------*/
 
-    public FmaParamScript setScript(String script) {
+    public FmScript setScript(String script) {
         this.script = script;
         return this;
     }
 
-    public FmaParamScript setScriptParam(String scriptParam) {
+    public FmScript setScriptParam(String scriptParam) {
         this.scriptParam = scriptParam;
         return this;
     }
 
-    public FmaParamScript setPreRequest(String preRequest) {
+    public FmScript setPreRequest(String preRequest) {
         this.preRequest = preRequest;
         return this;
     }
 
-    public FmaParamScript setPreRequestParam(String preRequestParam) {
+    public FmScript setPreRequestParam(String preRequestParam) {
         this.preRequestParam = preRequestParam;
         return this;
     }
 
-    public FmaParamScript setPreSort(String preSort) {
+    public FmScript setPreSort(String preSort) {
         this.preSort = preSort;
         return this;
     }
 
-    public FmaParamScript setPreSortParam(String preSortParam) {
+    public FmScript setPreSortParam(String preSortParam) {
         this.preSortParam = preSortParam;
         return this;
     }
 
-    public FmaParamScript setLayoutReponse(String layoutReponse) {
+    public FmScript setLayoutReponse(String layoutReponse) {
         this.layoutReponse = layoutReponse;
         return this;
     }

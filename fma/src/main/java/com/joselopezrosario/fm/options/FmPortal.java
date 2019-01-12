@@ -1,16 +1,15 @@
-package com.joselopezrosario.fma;
+package com.joselopezrosario.fm.options;
 
-public class FmaParamPortal {
+public class FmPortal {
     private String name;
     private String limit;
     private String offset;
 
 
-    public FmaParamPortal(String name, int limit, int offset) {
+    public FmPortal(String name, int limit, int offset) {
         this.setName(name);
         this.setLimit(limit);
         this.setOffset(offset);
-
     }
 
     /* ---------------------------------------------------------------------------------------------
@@ -32,17 +31,17 @@ public class FmaParamPortal {
     Private setters
     ----------------------------------------------------------------------------------------------*/
 
-    private FmaParamPortal setName(String name) {
+    private FmPortal setName(String name) {
         this.name = name;
         return this;
     }
 
-    private FmaParamPortal setLimit(int limit) {
+    private FmPortal setLimit(int limit) {
         this.limit = String.valueOf(limit);
         return this;
     }
 
-    private FmaParamPortal setOffset(int offset) {
+    private FmPortal setOffset(int offset) {
         this.offset = String.valueOf(offset);
         return this;
     }

@@ -1,12 +1,17 @@
-package com.joselopezrosario.fma;
+package com.joselopezrosario.fm;
 
 
 import android.net.Uri;
 import android.support.annotation.Nullable;
 
+import com.joselopezrosario.fm.options.FmPortal;
+import com.joselopezrosario.fm.options.FmQuery;
+import com.joselopezrosario.fm.options.FmScript;
+import com.joselopezrosario.fm.options.FmSort;
+
 import java.util.ArrayList;
 
-public class FmaRequest {
+public class FmRequest {
     public static final String EMPTY_BODY = "{}";
     public static final String POST = "POST";
     public static final String DELETE = "DELETE";
@@ -16,6 +21,7 @@ public class FmaRequest {
     private static final String LOGIN = "LOGIN";
     private static final String LOGOUT = "LOGOUT";
     private static final String GETRECORDS = "GETRECORDS";
+    private static final String FINDRECORDS = "FINDRECORDS";
     private boolean disableSSL;
     private String fmMethod;
     private String endpoint;
@@ -28,13 +34,13 @@ public class FmaRequest {
     private String token;
     private String limit;
     private String offset;
-    private ArrayList<FmaParamPortal> fmaParamPortal;
-    private ArrayList<FmaParamSort> fmaParamSort;
-    private FmaParamScript fmaParamScript;
+    private ArrayList<FmPortal> fmPortal;
+    private ArrayList<FmSort> fmSort;
+    private FmScript fmScript;
     private String message;
     private Boolean success;
 
-    public FmaRequest() {
+    public FmRequest() {
         this.setLayout(null);
         this.setOffset(1);
         this.setLimit(100);
@@ -52,9 +58,9 @@ public class FmaRequest {
      * @param endpoint the FileMaker Data API endpoint (ex: https://host/fmi/data/v1/databases/MyDatabase)
      * @param account  the FileMaker account with fmrest extended privileges
      * @param password the FileMaker account's password
-     * @return an FmaRequest object
+     * @return an FmRequest object
      */
-    public FmaRequest login(String endpoint, String account, String password) {
+    public FmRequest login(String endpoint, String account, String password) {
         if (endpoint == null || account == null || password == null) {
             this.setOk(false);
             return this;
@@ -75,9 +81,9 @@ public class FmaRequest {
      *
      * @param endpoint the FileMaker Data API endpoint (ex: https://host/fmi/data/v1/databases/MyDatabase)
      * @param token    the token returned in the response by executing the login request
-     * @return an FmaRequest object
+     * @return an FmRequest object
      */
-    public FmaRequest logout(String endpoint, String token) {
+    public FmRequest logout(String endpoint, String token) {
         String url = endpoint + "/sessions/" + token;
         this.setFmMethod(LOGOUT);
         this.setEndpoint(url);
@@ -94,29 +100,48 @@ public class FmaRequest {
      * @param endpoint the FileMaker Data API endpoint (ex: https://host/fmi/data/v1/databases/MyDatabase)
      * @param token    the token returned in the response by executing the login request
      * @param layout   the layout from where to retrieve the records
-     * @return an FmaRequest object
+     * @return an FmRequest object
      */
-    public FmaRequest getRecords(String endpoint, String token, String layout) {
+    public FmRequest getRecords(String endpoint, String token, String layout) {
         this.setFmMethod(GETRECORDS);
         this.setEndpoint(endpoint);
         this.setToken(token);
         this.setLayout(layout);
-        this.setToken(token);
         this.setMethod(GET);
         this.setBody(EMPTY_BODY);
         this.setAuth(BEARER);
         return this;
     }
 
+    /**
+     * FindRecords
+     *
+     * @param endpoint the FileMaker Data API endpoint (ex: https://host/fmi/data/v1/databases/MyDatabase)
+     * @param token    the token returned in the response by executing the login request
+     * @param layout   the layout from where to retrieve the records
+     * @param body     an FmQuery object containing the find request(s)
+     * @return an FmRequest object
+     */
+    public FmRequest findRecords(String endpoint, String token, String layout, FmQuery body) {
+        this.setFmMethod(FINDRECORDS);
+        this.setEndpoint(endpoint);
+        this.setToken(token);
+        this.setLayout(layout);
+        this.setMethod(POST);
+        this.setBody(body);
+        this.setAuth(BEARER);
+        return this;
+    }
 
-    public FmaRequest build() {
+
+    public FmRequest build() {
         // TODO: Final validation
         this.setOk(true);
         if (this.fmMethod.equals(LOGIN) || this.fmMethod.equals(LOGOUT)) {
             return this;
         }
         if (this.method.equals(GET)) {
-            return buildGet(this.endpoint, this.layout, this.limit, this.offset, this.fmaParamSort, this.fmaParamPortal, this.fmaParamScript);
+            return buildGet(this.endpoint, this.layout, this.limit, this.offset, this.fmSort, this.fmPortal, this.fmScript);
         } else {
             // TODO: Handle POST, PATCH, DELETE
             return null;
@@ -124,20 +149,20 @@ public class FmaRequest {
     }
 
     /**
-     * @param endpoint                 the FileMaker Data API endpoint (ex: https://host/fmi/data/v1/databases/MyDatabase)
-     * @param layout                   the layout from where to retrieve the records
-     * @param limit                    the maximum number of records that should be returned
-     * @param offset                   the record number of the first record in the range of records
-     * @param fmaParamSortArrayList   an ArrayList of sort parameter objects
-     * @param fmaParamPortalArrayList an ArrayList of portal parameter objects
+     * @param endpoint          the FileMaker Data API endpoint (ex: https://host/fmi/data/v1/databases/MyDatabase)
+     * @param layout            the layout from where to retrieve the records
+     * @param limit             the maximum number of records that should be returned
+     * @param offset            the record number of the first record in the range of records
+     * @param fmSortArrayList   an ArrayList of sort parameter objects
+     * @param fmPortalArrayList an ArrayList of portal parameter objects
      * @return
      */
-    private FmaRequest buildGet(String endpoint, String layout,
-                                @Nullable String limit,
-                                @Nullable String offset,
-                                @Nullable ArrayList<FmaParamSort> fmaParamSortArrayList,
-                                @Nullable ArrayList<FmaParamPortal> fmaParamPortalArrayList,
-                                @Nullable FmaParamScript fmaParamScript) {
+    private FmRequest buildGet(String endpoint, String layout,
+                               @Nullable String limit,
+                               @Nullable String offset,
+                               @Nullable ArrayList<FmSort> fmSortArrayList,
+                               @Nullable ArrayList<FmPortal> fmPortalArrayList,
+                               @Nullable FmScript fmScript) {
         /*------------------------------------------------------------------------------------------
         Build the URL parameters (limit/offset, sort, portal, and script params).
         ------------------------------------------------------------------------------------------*/
@@ -156,12 +181,12 @@ public class FmaRequest {
         Build the sort parameters
         ------------------------------------------------------------------------------------------*/
         String sortParams = "";
-        if (fmaParamSortArrayList != null) {
-            int countSortParams = fmaParamSortArrayList.size();
+        if (fmSortArrayList != null) {
+            int countSortParams = fmSortArrayList.size();
             String[] sortParamsArray = new String[countSortParams];
             int i = 0;
             while (countSortParams > i) {
-                FmaParamSort fmaSortParam = fmaParamSortArrayList.get(i);
+                FmSort fmaSortParam = fmSortArrayList.get(i);
                 String fieldName = fmaSortParam.getFieldName();
                 String sortOrder = fmaSortParam.getSortOrder();
                 sortParamsArray[i] = "{\"fieldName\":" + "\"" + fieldName + "\",\"sortOrder\":" + "\"" + sortOrder + "\"}";
@@ -174,16 +199,16 @@ public class FmaRequest {
         Build the portal parameters
         ------------------------------------------------------------------------------------------*/
         String portalParams = "";
-        if (fmaParamPortalArrayList != null) {
+        if (fmPortalArrayList != null) {
             StringBuilder portalOptionalParams = new StringBuilder();
-            int countPortalParams = fmaParamPortalArrayList.size();
+            int countPortalParams = fmPortalArrayList.size();
             String[] portalNames = new String[countPortalParams];
             int i = 0;
             while (countPortalParams > i) {
-                FmaParamPortal fmaParamPortal = fmaParamPortalArrayList.get(i);
-                String portalName = fmaParamPortal.getName();
-                String portalLimit = fmaParamPortal.getLimit();
-                String portalOffset = fmaParamPortal.getOffset();
+                FmPortal fmPortal = fmPortalArrayList.get(i);
+                String portalName = fmPortal.getName();
+                String portalLimit = fmPortal.getLimit();
+                String portalOffset = fmPortal.getOffset();
                 portalNames[i] = "\"" + portalName + "\"";
                 if (portalLimit != null) {
                     portalOptionalParams = portalOptionalParams.append("&_limit.").append(portalName).append("=").append(portalLimit);
@@ -200,14 +225,14 @@ public class FmaRequest {
         Build the script parameters
         ------------------------------------------------------------------------------------------*/
         StringBuilder scriptParams = new StringBuilder();
-        if (fmaParamScript != null){
-            String script = fmaParamScript.getScript();
-            String scriptParam = fmaParamScript.getScriptParam();
-            String preRequest = fmaParamScript.getPreRequest();
-            String preRequestParam = fmaParamScript.getPreRequestParam();
-            String preSort = fmaParamScript.getPreSort();
-            String preSortParam = fmaParamScript.getPreSortParam();
-            String layoutResponse = fmaParamScript.getLayoutReponse();
+        if (fmScript != null) {
+            String script = fmScript.getScript();
+            String scriptParam = fmScript.getScriptParam();
+            String preRequest = fmScript.getPreRequest();
+            String preRequestParam = fmScript.getPreRequestParam();
+            String preSort = fmScript.getPreSort();
+            String preSortParam = fmScript.getPreSortParam();
+            String layoutResponse = fmScript.getLayoutReponse();
             if (script != null) {
                 scriptParams = scriptParams.append("&script").append("=").append(Uri.encode(script));
             }
@@ -260,33 +285,33 @@ public class FmaRequest {
     /* ---------------------------------------------------------------------------------------------
     Public setters
     ----------------------------------------------------------------------------------------------*/
-    public FmaRequest setLimit(int limit) {
+    public FmRequest setLimit(int limit) {
         this.limit = String.valueOf(limit);
         return this;
     }
 
-    public FmaRequest setOffset(int offset) {
+    public FmRequest setOffset(int offset) {
         this.offset = String.valueOf(offset);
         return this;
     }
 
-    public FmaRequest disableSSL(boolean disableSSL) {
+    public FmRequest disableSSL(boolean disableSSL) {
         this.disableSSL = disableSSL;
         return this;
     }
 
-    public FmaRequest setPortalParams(ArrayList<FmaParamPortal> fmaParamPortalArrayList) {
-        this.fmaParamPortal = fmaParamPortalArrayList;
+    public FmRequest setPortalParams(ArrayList<FmPortal> fmPortalArrayList) {
+        this.fmPortal = fmPortalArrayList;
         return this;
     }
 
-    public FmaRequest setSortParams(ArrayList<FmaParamSort> fmaParamSortArrayList) {
-        this.fmaParamSort = fmaParamSortArrayList;
+    public FmRequest setSortParams(ArrayList<FmSort> fmSortArrayList) {
+        this.fmSort = fmSortArrayList;
         return this;
     }
 
-    public FmaRequest setScriptPrams(FmaParamScript fmaParamSortArrayList) {
-        this.fmaParamScript = fmaParamSortArrayList;
+    public FmRequest setScriptPrams(FmScript fmaParamSortArrayList) {
+        this.fmScript = fmaParamSortArrayList;
         return this;
     }
 
@@ -304,6 +329,11 @@ public class FmaRequest {
 
     private void setBody(String body) {
         this.body = body;
+    }
+
+    private void setBody(FmQuery body) {
+        // TODO: Convert to JSON string
+        this.body = "{}";
     }
 
     private void setAuth(String auth) {
@@ -359,5 +389,9 @@ public class FmaRequest {
 
     String getPassword() {
         return password;
+    }
+
+    public boolean isSSLDisabled() {
+        return disableSSL;
     }
 }

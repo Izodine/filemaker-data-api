@@ -1,13 +1,14 @@
 package com.joselopezrosario.fma_sample;
 
-import com.joselopezrosario.fma.Fma;
-import com.joselopezrosario.fma.FmaData;
-import com.joselopezrosario.fma.FmaParamPortal;
-import com.joselopezrosario.fma.FmaParamScript;
-import com.joselopezrosario.fma.FmaRecord;
-import com.joselopezrosario.fma.FmaRequest;
-import com.joselopezrosario.fma.FmaResponse;
-import com.joselopezrosario.fma.FmaParamSort;
+import com.joselopezrosario.fm.Fm;
+import com.joselopezrosario.fm.FmData;
+import com.joselopezrosario.fm.options.FmPortal;
+import com.joselopezrosario.fm.options.FmScript;
+import com.joselopezrosario.fm.options.FmQuery;
+import com.joselopezrosario.fm.FmRequest;
+import com.joselopezrosario.fm.FmResponse;
+import com.joselopezrosario.fm.FmRecord;
+import com.joselopezrosario.fm.options.FmSort;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -31,15 +32,14 @@ public class UnitTests {
 
     @BeforeClass
     public static void login() {
-        FmaRequest request = new FmaRequest()
+        FmRequest request = new FmRequest()
                 .login(ENDPOINT, ACCOUNT, PASSWORD)
-                .disableSSL(true)
                 .build();
         if (!request.isOk()) {
             assert false;
             return;
         }
-        FmaResponse response = Fma.execute(request);
+        FmResponse response = Fm.execute(request);
         if (!response.isOk()) {
             assert false;
             return;
@@ -55,24 +55,23 @@ public class UnitTests {
 
     @Test
     public void getRecords() {
-        FmaRequest request = new FmaRequest()
+        FmRequest request = new FmRequest()
                 .getRecords(ENDPOINT, token, LAYOUT_VGSALES)
                 .setLimit(1)
                 .setOffset(1)
-                .disableSSL(true)
                 .build();
         if (!request.isOk()) {
             assert false;
             return;
         }
-        FmaResponse response = Fma.execute(request);
+        FmResponse response = Fm.execute(request);
         if (!response.isOk()) {
             assert false;
             return;
         }
 
-        FmaData data = new FmaData().create(response);
-        FmaRecord record = data.getRecord(0);
+        FmData data = new FmData().create(response);
+        FmRecord record = data.getRecord(0);
         String recordId = record.getRecordId();
         String modId = record.getModId();
         String rank = record.getValue("Rank");
@@ -90,80 +89,77 @@ public class UnitTests {
 
     @Test
     public void getPortalData() {
-        FmaParamPortal portalVgSales = new FmaParamPortal(LAYOUT_VGSALES, 3, 1);
-        FmaParamPortal portalPublishers = new FmaParamPortal(LAYOUT_PUBLISHERS, 3, 1);
-        ArrayList<FmaParamPortal> fmaParamPortalArrayList = new ArrayList<>();
-        fmaParamPortalArrayList.add(portalVgSales);
-        fmaParamPortalArrayList.add(portalPublishers);
-        FmaRequest request = new FmaRequest()
+        FmPortal portalVgSales = new FmPortal(LAYOUT_VGSALES, 3, 1);
+        FmPortal portalPublishers = new FmPortal(LAYOUT_PUBLISHERS, 3, 1);
+        ArrayList<FmPortal> fmPortalArrayList = new ArrayList<>();
+        fmPortalArrayList.add(portalVgSales);
+        fmPortalArrayList.add(portalPublishers);
+        FmRequest request = new FmRequest()
                 .getRecords(ENDPOINT, token, LAYOUT_GENRES)
                 .setLimit(10)
                 .setOffset(1)
-                .setPortalParams(fmaParamPortalArrayList)
-                .disableSSL(true)
+                .setPortalParams(fmPortalArrayList)
                 .build();
         if (!request.isOk()) {
             assert false;
             return;
         }
-        FmaResponse response = Fma.execute(request);
+        FmResponse response = Fm.execute(request);
         if (!response.isOk()) {
             assert false;
             return;
         }
-        FmaData data = new FmaData().create(response);
-        FmaRecord record = data.getRecord(0);
-        FmaRecord portalRecord = record.getPortalRecord(LAYOUT_VGSALES, 0);
+        FmData data = new FmData().create(response);
+        FmRecord record = data.getRecord(0);
+        FmRecord portalRecord = record.getPortalRecord(LAYOUT_VGSALES, 0);
         assert parseVgSales(portalRecord);
     }
 
     @Test
     public void getSortedRecords() {
-        FmaParamSort sortByGenre = new FmaParamSort("Genre");
-        FmaParamSort sortByRank = new FmaParamSort("Rank").descend();
-        ArrayList<FmaParamSort> sortParams = new ArrayList<>();
+        FmSort sortByGenre = new FmSort("Genre");
+        FmSort sortByRank = new FmSort("Rank").descend();
+        ArrayList<FmSort> sortParams = new ArrayList<>();
         sortParams.add(sortByGenre);
         sortParams.add(sortByRank);
-        FmaRequest request = new FmaRequest()
+        FmRequest request = new FmRequest()
                 .getRecords(ENDPOINT, token, LAYOUT_VGSALES)
                 .setLimit(1000)
                 .setOffset(1)
                 .setSortParams(sortParams)
-                .disableSSL(true)
                 .build();
         if (!request.isOk()) {
             assert false;
             return;
         }
-        FmaResponse response = Fma.execute(request);
+        FmResponse response = Fm.execute(request);
         if (!response.isOk()) {
             assert false;
             return;
         }
-        FmaData data = new FmaData().create(response);
-        FmaRecord record = data.getRecord(0);
+        FmData data = new FmData().create(response);
+        FmRecord record = data.getRecord(0);
         assert parseVgSales(record);
     }
 
     @Test
     public void getRecordsRunScript() {
-        FmaParamScript script = new FmaParamScript()
+        FmScript script = new FmScript()
                 .setScript("log").setScriptParam("Hello from script")
                 .setPreRequest("log").setPreRequestParam("Hello from pre-request script")
                 .setPreSort("log").setPreSortParam("Hello from pre-sort script")
                 .setLayoutReponse(LAYOUT_VGSALES);
-        FmaRequest request = new FmaRequest()
+        FmRequest request = new FmRequest()
                 .getRecords(ENDPOINT, token, LAYOUT_VGSALES)
                 .setLimit(10)
                 .setOffset(1)
                 .setScriptPrams(script)
-                .disableSSL(true)
                 .build();
         if (!request.isOk()) {
             assert false;
             return;
         }
-        FmaResponse response = Fma.execute(request);
+        FmResponse response = Fm.execute(request);
         if (!response.isOk()) {
             assert false;
             return;
@@ -176,8 +172,8 @@ public class UnitTests {
         int scriptErrorPreSort = response.getScriptErrorPreSort();
         String scriptResultPreSort = response.getScriptResultPreSort();
 
-        FmaData data = new FmaData().create(response);
-        FmaRecord record = data.getRecord(0);
+        FmData data = new FmData().create(response);
+        FmRecord record = data.getRecord(0);
         boolean parsed = parseVgSales(record);
 
         assert parsed
@@ -189,17 +185,32 @@ public class UnitTests {
                 && scriptResultPreSort.equals("Ok");
     }
 
+    @Test
+    // TODO: Complete the FmaRequest.findRecords() method and complete this test
+    public void findRecords(){
+        FmQuery findGames = new FmQuery();
+        findGames.newFindRequest().set("Publisher","Nintendo").set("Year","1985");
+        findGames.newFindRequest().set("Publisher","Sega").set("Year","1991...1996");
+        findGames.newFindRequest().set("Publisher","Sega").set("Year","1994").omit();
+        FmRequest request = new FmRequest()
+                .findRecords(ENDPOINT, token, LAYOUT_VGSALES, findGames)
+                .build();
+        System.out.println(findGames.countFindRequests());
+        System.out.println(findGames.countQueries());
+        assert findGames.countQueries() == 6;
+
+    }
+
     @AfterClass
     public static void logout() {
-        FmaRequest request = new FmaRequest()
+        FmRequest request = new FmRequest()
                 .logout(ENDPOINT, token)
-                .disableSSL(true)
                 .build();
         if (!request.isOk()) {
             assert false;
             return;
         }
-        FmaResponse response = Fma.execute(request);
+        FmResponse response = Fm.execute(request);
         if (!response.isOk()) {
             assert false;
             return;
@@ -208,7 +219,7 @@ public class UnitTests {
 
     }
 
-    private static boolean parseVgSales(FmaRecord record) {
+    private static boolean parseVgSales(FmRecord record) {
         String recordId = record.getRecordId();
         String modId = record.getModId();
         String rank = record.getValue("Rank");

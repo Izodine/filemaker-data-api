@@ -1,15 +1,15 @@
-package com.joselopezrosario.fma;
+package com.joselopezrosario.fm;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class FmaRecord {
+public class FmRecord {
     private JSONObject record;
     private String portalName;
     private boolean isPortalRecord;
 
-    public FmaRecord(JSONObject record) {
+    public FmRecord(JSONObject record) {
         this.record = record;
     }
 
@@ -31,12 +31,12 @@ public class FmaRecord {
         }
     }
 
-    public FmaRecord getPortalRecord (String portalName, int index){
+    public FmRecord getPortalRecord (String portalName, int index){
         try {
             JSONObject portalData = this.record.getJSONObject("portalData");
             JSONArray portalRecords = portalData.getJSONArray(portalName);
             JSONObject record = portalRecords.getJSONObject(index);
-            return new FmaRecord(record).setPortalName(portalName).setIsPortalRecord(true);
+            return new FmRecord(record).setPortalName(portalName).setIsPortalRecord(true);
         }catch(JSONException e){
             e.printStackTrace();
             return null;
@@ -64,7 +64,7 @@ public class FmaRecord {
         return portalName;
     }
 
-    private FmaRecord setPortalName(String portalName) {
+    private FmRecord setPortalName(String portalName) {
         this.portalName = portalName;
         return this;
     }
@@ -73,7 +73,7 @@ public class FmaRecord {
         return isPortalRecord;
     }
 
-    private FmaRecord setIsPortalRecord(boolean portalRecord) {
+    private FmRecord setIsPortalRecord(boolean portalRecord) {
         isPortalRecord = portalRecord;
         return this;
     }

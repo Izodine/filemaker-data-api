@@ -1,10 +1,10 @@
-package com.joselopezrosario.fma;
+package com.joselopezrosario.fm;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class FmaResponse {
+public class FmResponse {
     private static final String TOKEN = "token";
     private static final String SCRIPT_ERROR = "scriptError";
     private static final String SCRIPT_RESULT = "scriptResult";
@@ -26,7 +26,7 @@ public class FmaResponse {
     private String ScriptResultPreSort;
 
 
-    public FmaResponse() {
+    public FmResponse() {
     }
 
     /*------------------------------------------------------------------------------------------
@@ -117,7 +117,7 @@ public class FmaResponse {
      * setFmResponse
      * Set the response, and parse out and set the message and script responses into their own fields
      *
-     * @param fmResponse an FmaResponse object
+     * @param fmResponse an FmResponse object
      */
     void setFmResponse(JSONObject fmResponse) {
         this.fmResponse = fmResponse;

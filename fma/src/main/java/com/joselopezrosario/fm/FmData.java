@@ -1,22 +1,22 @@
-package com.joselopezrosario.fma;
+package com.joselopezrosario.fm;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 
-public class FmaData {
+public class FmData {
     private JSONArray data;
 
-    public FmaData() {
+    public FmData() {
     }
 
     /**
      * create
-     * Creates a JSONObject from the data element of the FmaResponse
+     * Creates a JSONObject from the data element of the FmResponse
      *
-     * @param response the FmaResponse object
+     * @param response the FmResponse object
      * @return an FMData object
      */
-    public FmaData create(FmaResponse response) {
+    public FmData create(FmResponse response) {
         try {
             this.setData(response.getFmResponse().getJSONArray("data"));
             return this;
@@ -33,12 +33,12 @@ public class FmaData {
      * @param index the record's position
      * @return a record in JSONObject format
      */
-    public FmaRecord getRecord(int index) {
+    public FmRecord getRecord(int index) {
         if (index > this.size()) {
             return null;
         } else {
             try {
-                return new FmaRecord(this.getData().getJSONObject(index));
+                return new FmRecord(this.getData().getJSONObject(index));
             } catch (JSONException e) {
                 e.printStackTrace();
                 return null;
