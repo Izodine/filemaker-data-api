@@ -1,4 +1,4 @@
-package com.joselopezrosario.fm.options;
+package com.joselopezrosario.fm;
 
 public class FmScript {
     private String script;

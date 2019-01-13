@@ -2,13 +2,13 @@ package com.joselopezrosario.fma_sample;
 
 import com.joselopezrosario.fm.Fm;
 import com.joselopezrosario.fm.FmData;
-import com.joselopezrosario.fm.options.FmPortal;
-import com.joselopezrosario.fm.options.FmScript;
-import com.joselopezrosario.fm.options.FmQuery;
+import com.joselopezrosario.fm.FmPortal;
+import com.joselopezrosario.fm.FmScript;
+import com.joselopezrosario.fm.FmQuery;
 import com.joselopezrosario.fm.FmRequest;
 import com.joselopezrosario.fm.FmResponse;
 import com.joselopezrosario.fm.FmRecord;
-import com.joselopezrosario.fm.options.FmSort;
+import com.joselopezrosario.fm.FmSort;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -117,16 +117,14 @@ public class UnitTests {
 
     @Test
     public void getSortedRecords() {
-        FmSort sortByGenre = new FmSort("Genre");
-        FmSort sortByRank = new FmSort("Rank").descend();
-        ArrayList<FmSort> sortParams = new ArrayList<>();
-        sortParams.add(sortByGenre);
-        sortParams.add(sortByRank);
+        FmSort fmSort = new FmSort()
+                .sortAsc("Genre")
+                .sortDesc("Rank");
         FmRequest request = new FmRequest()
                 .getRecords(ENDPOINT, token, LAYOUT_VGSALES)
                 .setLimit(1000)
                 .setOffset(1)
-                .setSortParams(sortParams)
+                .setSortParams(fmSort)
                 .build();
         if (!request.isOk()) {
             assert false;

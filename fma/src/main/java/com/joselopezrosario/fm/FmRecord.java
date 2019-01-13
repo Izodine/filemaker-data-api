@@ -36,7 +36,7 @@ public class FmRecord {
             JSONObject portalData = this.record.getJSONObject("portalData");
             JSONArray portalRecords = portalData.getJSONArray(portalName);
             JSONObject record = portalRecords.getJSONObject(index);
-            return new FmRecord(record).setPortalName(portalName).setIsPortalRecord(true);
+            return new FmRecord(record).setPortalName(portalName).setIsPortalRecord();
         }catch(JSONException e){
             e.printStackTrace();
             return null;
@@ -73,8 +73,8 @@ public class FmRecord {
         return isPortalRecord;
     }
 
-    private FmRecord setIsPortalRecord(boolean portalRecord) {
-        isPortalRecord = portalRecord;
+    private FmRecord setIsPortalRecord() {
+        isPortalRecord = true;
         return this;
     }
 }

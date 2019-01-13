@@ -4,11 +4,6 @@ package com.joselopezrosario.fm;
 import android.net.Uri;
 import android.support.annotation.Nullable;
 
-import com.joselopezrosario.fm.options.FmPortal;
-import com.joselopezrosario.fm.options.FmQuery;
-import com.joselopezrosario.fm.options.FmScript;
-import com.joselopezrosario.fm.options.FmSort;
-
 import java.util.ArrayList;
 
 public class FmRequest {
@@ -35,7 +30,8 @@ public class FmRequest {
     private String limit;
     private String offset;
     private ArrayList<FmPortal> fmPortal;
-    private ArrayList<FmSort> fmSort;
+    private FmSort fmSort;
+    //private ArrayList<FmSort_v1> fmSortV1;
     private FmScript fmScript;
     private String message;
     private Boolean success;
@@ -141,7 +137,7 @@ public class FmRequest {
             return this;
         }
         if (this.method.equals(GET)) {
-            return buildGet(this.endpoint, this.layout, this.limit, this.offset, this.fmSort, this.fmPortal, this.fmScript);
+            return build(this.endpoint, this.layout, this.limit, this.offset, this.fmSort, this.fmPortal, this.fmScript);
         } else {
             // TODO: Handle POST, PATCH, DELETE
             return null;
@@ -153,16 +149,16 @@ public class FmRequest {
      * @param layout            the layout from where to retrieve the records
      * @param limit             the maximum number of records that should be returned
      * @param offset            the record number of the first record in the range of records
-     * @param fmSortArrayList   an ArrayList of sort parameter objects
+     * @param fmSort   an ArrayList of sort parameter objects
      * @param fmPortalArrayList an ArrayList of portal parameter objects
      * @return
      */
-    private FmRequest buildGet(String endpoint, String layout,
-                               @Nullable String limit,
-                               @Nullable String offset,
-                               @Nullable ArrayList<FmSort> fmSortArrayList,
-                               @Nullable ArrayList<FmPortal> fmPortalArrayList,
-                               @Nullable FmScript fmScript) {
+    private FmRequest build(String endpoint, String layout,
+                            @Nullable String limit,
+                            @Nullable String offset,
+                            @Nullable FmSort fmSort,
+                            @Nullable ArrayList<FmPortal> fmPortalArrayList,
+                            @Nullable FmScript fmScript) {
         /*------------------------------------------------------------------------------------------
         Build the URL parameters (limit/offset, sort, portal, and script params).
         ------------------------------------------------------------------------------------------*/
@@ -177,28 +173,17 @@ public class FmRequest {
         if (offset != null) {
             paramsArray.add("_offset=" + offset);
         }
+        // TODO: Create a method to return this data so it can be reused for GET and POST/PATCH
         /*------------------------------------------------------------------------------------------
         Build the sort parameters
         ------------------------------------------------------------------------------------------*/
-        String sortParams = "";
-        if (fmSortArrayList != null) {
-            int countSortParams = fmSortArrayList.size();
-            String[] sortParamsArray = new String[countSortParams];
-            int i = 0;
-            while (countSortParams > i) {
-                FmSort fmaSortParam = fmSortArrayList.get(i);
-                String fieldName = fmaSortParam.getFieldName();
-                String sortOrder = fmaSortParam.getSortOrder();
-                sortParamsArray[i] = "{\"fieldName\":" + "\"" + fieldName + "\",\"sortOrder\":" + "\"" + sortOrder + "\"}";
-                i++;
-            }
-            sortParams = "_sort=[" + android.text.TextUtils.join(",", sortParamsArray) + "]";
-            paramsArray.add(sortParams);
-        }
+        String sortParams = getSortString(fmSort, 1);
+        paramsArray.add(sortParams);
+        // TODO: Create a method to return this data so it can be reused for GET and POST/PATCH
         /*------------------------------------------------------------------------------------------
         Build the portal parameters
         ------------------------------------------------------------------------------------------*/
-        String portalParams = "";
+        String portalParams;
         if (fmPortalArrayList != null) {
             StringBuilder portalOptionalParams = new StringBuilder();
             int countPortalParams = fmPortalArrayList.size();
@@ -221,6 +206,7 @@ public class FmRequest {
             portalParams = "portal=[" + android.text.TextUtils.join(",", portalNames) + "]" + portalOptionalParams;
             paramsArray.add(portalParams);
         }
+        // TODO: Create a method to return this data so it can be reused for GET and POST/PATCH
         /*------------------------------------------------------------------------------------------
         Build the script parameters
         ------------------------------------------------------------------------------------------*/
@@ -271,6 +257,48 @@ public class FmRequest {
         return this;
     }
 
+    private FmRequest build(String endpoint, String layout,
+                            FmQuery body,
+                            @Nullable String limit,
+                            @Nullable String offset,
+                            @Nullable FmSort fmSort,
+                            @Nullable ArrayList<FmPortal> fmPortalArrayList,
+                            @Nullable FmScript fmScript){
+
+        return null;
+    }
+
+    /**
+     * getSortString
+     * @param fmSort
+     * @param type 1 for URL and 2 for body
+     * @return
+     */
+    private String getSortString(@Nullable FmSort fmSort, int type){
+        if ( fmSort == null ){
+            return "";
+        }
+        ArrayList<Sort> sortParams = fmSort.getSortParams();
+        if ( sortParams == null ){
+            return "";
+        }
+        int countSortParams = sortParams.size();
+        String[] sortParamsArray = new String[countSortParams];
+        int i = 0;
+        while (countSortParams > i) {
+            Sort fmaSortParam = sortParams.get(i);
+            String fieldName = fmaSortParam.getFieldName();
+            String sortOrder = fmaSortParam.getSortOrder();
+            sortParamsArray[i] = "{\"fieldName\":" + "\"" + fieldName + "\",\"sortOrder\":" + "\"" + sortOrder + "\"}";
+            i++;
+        }
+        if ( type == 1 ){
+            return  "_sort=[" + android.text.TextUtils.join(",", sortParamsArray) + "]";
+        } else{
+            return  "\"sort\":[" + android.text.TextUtils.join(",", sortParamsArray) + "]";
+        }
+    }
+
     /* ---------------------------------------------------------------------------------------------
     Public getters
     ----------------------------------------------------------------------------------------------*/
@@ -305,8 +333,8 @@ public class FmRequest {
         return this;
     }
 
-    public FmRequest setSortParams(ArrayList<FmSort> fmSortArrayList) {
-        this.fmSort = fmSortArrayList;
+    public FmRequest setSortParams(FmSort fmSort) {
+        this.fmSort = fmSort;
         return this;
     }
 

@@ -90,9 +90,46 @@ Get the first 20 records from the vgsales layout.
         .setOffset(1)
         .build();
 ```
+### ***FmRequest.findRecords()***
+
+Find records through one or many find criteria.
+```java
+   /**
+     * FindRecords
+     *
+     * @param endpoint the FileMaker Data API endpoint (ex: https://host/fmi/data/v1/databases/MyDatabase)
+     * @param token    the token returned in the response by executing the login request
+     * @param layout   the layout from where to retrieve the records
+     * @param body     an FmQuery object containing the find request(s)
+     * @return an FmRequest object
+     */
+    public FmRequest findRecords(String endpoint, String token, String layout, FmQuery body)
+```
+**Usage:**
+The following query finds all the games published by Nintendo in 1985, all the games published by Sega between 1991 and 1996, but it omits the games published by Sega in 1994.
+
+```java
+    FmQuery findGames = new FmQuery();
+    findGames.newFindRequest()
+        .set("Publisher","Nintendo")
+        .set("Year","1985");
+    findGames.newFindRequest()
+        .set("Publisher","Sega")
+        .set("Year","1991...1996");
+    findGames.newFindRequest()
+        .set("Publisher","Sega")
+        .set("Year","1994")
+        .omit();
+```
+You can then pass the FmQuery object to the FmRequest.findRecords() method.
+```java
+    FmRequest request = new FmRequest()
+        .findRecords(ENDPOINT, token, LAYOUT_VGSALES, findGames)
+        .build();
+```
 
 ---
-# Optional Classes
+# Support Classes
 Use these classes to build the optional request parameters.
 ## FmPortal
 ***To get related records***
@@ -124,32 +161,25 @@ Then, pass the ArrayList to the FmRequest object through the `setPortalParams()`
 ## FmSort
 
 ***To sort records***
-This example shows how to get the first 1,000 records from the vgsales layout, and to sort them by genre ascending and rank descending. 
+The FileMaker Data API allows you to sort records by multiple fields in ascending or descending order.
 
-You will set the field name and the sort order via FmSort objects. Create them using this constructor: `FmSort(String name)`. And then set the sort order by calling the `ascend()` or `descend()` method. 
+This example shows you how to get the first 1,000 records from the vgsales layout and sort them by genre ascending and rank descending. 
 
-For example: `new FmSort("Rank").descend()` to sort by rank descending. 
-
-Finally, add all objects to an `ArrayList()`.
-
-Here is a complete example:
+First, build an FmSort object and call the `sortAsc()` and `sortDesc()` methods with the names of the fields you want to sort by.
 
 ```java
-    // Create the FmSort objects
-    FmSort sortByGenre = new FmSort("Genre"); // note: sort order defaults to ascend
-    FmSort sortByRank = new FmSort("Rank").descend();
-       
-    // Add them to an ArrayList()
-    ArrayList<FmSort> sortParams = new ArrayList<>();
-    sortParams.add(sortByGenre);
-    sortParams.add(sortByRank);
-       
-    // Create a new FmRequest and pass the sort parameters through the setSortParams() method
+    FmSort fmSort = new FmSort()
+        .sortAsc("Genre")
+        .sortDesc("Rank");
+```
+Then, pass it to the FmRequest object.
+
+```java    
     FmRequest request = new FmRequest()
         .getRecords(ENDPOINT, token, LAYOUT_VGSALES)
         .setLimit(1000)
         .setOffset(1)
-        .setSortParams(sortParams) // set the sort parameters
+        .setSortParams(fmSort)
         .build();        
 ```
 ## FmScript
@@ -205,33 +235,22 @@ https://github.com/joselopezrosario/filemaker-data-api/issues/2
 ***To build find requests***
 The FileMaker Data API allows you to send multiple find requests in one query. This class allows you to easily create one or many find requests.
 
-FmQuery is composed of the following methods.
+FmQuery is composed of the following methods and you must call them in order.
 
-`newFindRequest()` to start a new find request
-`set()` to set the field name value pairs
-`omit()` to omit the records (defaults to false)
+1. `newFindRequest()` to start a new find request
+2. `set()` to set the field name value pairs (you can call this method multiple times)
+3. `omit()` to omit the records (optional: defaults to false)
 
-**Usage:**
-The following query finds all the games published by Nintendo in 1985, all the games published by Sega between 1991 and 1996, but it omits the games published by Sega in 1994.
+For example:
 
 ```java
-    FmQuery findGames = new FmQuery();
-    findGames.newFindRequest()
-        .set("Publisher","Nintendo")
-        .set("Year","1985");
-    findGames.newFindRequest()
-        .set("Publisher","Sega")
-        .set("Year","1991...1996");
-    findGames.newFindRequest()
-        .set("Publisher","Sega")
-        .set("Year","1994")
-        .omit();
-```
-You can then pass the FmQuery object to the FmRequest.findRecords() method.
-```java
-    FmRequest request = new FmRequest()
-        .findRecords(ENDPOINT, token, LAYOUT_VGSALES, findGames)
-        .build();
+// Create a new FmQuery object
+FmQuery findGames = new FmQuery();
+
+// Create a find records by chaining newFindRequest(), set(), and omit().
+findGames.newFindRequest().set("Publisher","Nintendo").set("Year","1985");
+findGames.newFindRequest().set("Publisher","Sega").set("Year","1991...1996");
+findGames.newFindRequest().set("Publisher","Sega").set("Year","1994").omit();
 ```
 ---
 # Testing
