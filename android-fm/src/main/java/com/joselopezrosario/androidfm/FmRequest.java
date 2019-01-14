@@ -2,6 +2,7 @@ package com.joselopezrosario.androidfm;
 
 
 import android.net.Uri;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import java.util.ArrayList;
@@ -16,12 +17,13 @@ public class FmRequest {
     private static final String LOGIN = "LOGIN";
     private static final String LOGOUT = "LOGOUT";
     private static final String GETRECORDS = "GETRECORDS";
+    private static final String GETRECORD = "GETRECORD";
     private static final String FINDRECORDS = "FINDRECORDS";
     private boolean disableSSL;
     private String fmMethod;
     private String endpoint;
+    private int recordId;
     private String method;
-    private String body;
     private String auth;
     private String accountName;
     private String password;
@@ -31,8 +33,9 @@ public class FmRequest {
     private String offset;
     private FmPortal fmPortal;
     private FmSort fmSort;
-    //private ArrayList<FmSort_v1> fmSortV1;
     private FmScript fmScript;
+    private FmFind fmFind;
+    private String body;
     private String message;
     private Boolean success;
 
@@ -56,11 +59,9 @@ public class FmRequest {
      * @param password the FileMaker account's password
      * @return an FmRequest object
      */
-    public FmRequest login(String endpoint, String account, String password) {
-        if (endpoint == null || account == null || password == null) {
-            this.setOk(false);
-            return this;
-        }
+    public FmRequest login(@NonNull String endpoint,
+                           @NonNull String account,
+                           @NonNull String password) {
         String url = endpoint + "/sessions";
         this.setFmMethod(LOGIN);
         this.setEndpoint(url);
@@ -79,7 +80,8 @@ public class FmRequest {
      * @param token    the token returned in the response by executing the login request
      * @return an FmRequest object
      */
-    public FmRequest logout(String endpoint, String token) {
+    public FmRequest logout(@NonNull String endpoint,
+                            @NonNull String token) {
         String url = endpoint + "/sessions/" + token;
         this.setFmMethod(LOGOUT);
         this.setEndpoint(url);
@@ -98,7 +100,9 @@ public class FmRequest {
      * @param layout   the layout from where to retrieve the records
      * @return an FmRequest object
      */
-    public FmRequest getRecords(String endpoint, String token, String layout) {
+    public FmRequest getRecords(@NonNull String endpoint,
+                                @NonNull String token,
+                                @NonNull String layout) {
         this.setFmMethod(GETRECORDS);
         this.setEndpoint(endpoint);
         this.setToken(token);
@@ -110,37 +114,128 @@ public class FmRequest {
     }
 
     /**
-     * FindRecords
+     * getRecords
      *
      * @param endpoint the FileMaker Data API endpoint (ex: https://host/fmi/data/v1/databases/MyDatabase)
      * @param token    the token returned in the response by executing the login request
      * @param layout   the layout from where to retrieve the records
-     * @param body     an FmQuery object containing the find request(s)
      * @return an FmRequest object
      */
-    public FmRequest findRecords(String endpoint, String token, String layout, FmQuery body) {
-        this.setFmMethod(FINDRECORDS);
+    public FmRequest getRecord(@NonNull String endpoint,
+                               @NonNull String token,
+                               @NonNull String layout,
+                               @NonNull int recordId) {
+        this.setFmMethod(GETRECORD);
+        this.setRecordId(recordId);
         this.setEndpoint(endpoint);
         this.setToken(token);
         this.setLayout(layout);
-        this.setMethod(POST);
-        this.setBody(body);
+        this.setMethod(GET);
+        this.setBody(EMPTY_BODY);
         this.setAuth(BEARER);
         return this;
     }
 
 
+    /**
+     * FindRecords
+     *
+     * @param endpoint the FileMaker Data API endpoint (ex: https://host/fmi/data/v1/databases/MyDatabase)
+     * @param token    the token returned in the response by executing the login request
+     * @param layout   the layout from where to retrieve the records
+     * @param fmFind     an FmFind object containing the find request(s)
+     * @return an FmRequest object
+     */
+    public FmRequest findRecords(@NonNull String endpoint,
+                                 @NonNull String token,
+                                 @NonNull String layout,
+                                 @NonNull FmFind fmFind) {
+        this.setFmMethod(FINDRECORDS);
+        this.setEndpoint(endpoint);
+        this.setToken(token);
+        this.setLayout(layout);
+        this.setMethod(POST);
+        this.setFmFind(fmFind);
+        this.setAuth(BEARER);
+        return this;
+    }
+
+
+    /**
+     * build
+     * Make sure that all required parameters are valid before returning the final request object.
+     * If there's an error, the request success field (accessed through isOk()) will return false.
+     * Additional informational about the error will be set in the message field (accessed through getMessage()).
+     *
+     * @return an FmRequest object
+     */
     public FmRequest build() {
-        // TODO: Final validation
-        this.setOk(true);
-        if (this.fmMethod.equals(LOGIN) || this.fmMethod.equals(LOGOUT)) {
+        if (this.getEndpoint() == null || this.getEndpoint().isEmpty()) {
+            this.setOk(false);
+            this.setMessage("Invalid endpoint: " + this.getEndpoint());
             return this;
         }
-        if (this.method.equals(GET)) {
-            return build(this.endpoint, this.layout, this.limit, this.offset, this.fmSort, this.fmPortal, this.fmScript);
-        } else {
-            // TODO: Handle POST, PATCH, DELETE
-            return null;
+        switch (fmMethod) {
+            case LOGIN:
+                if (this.getAccountName() == null || this.getAccountName().isEmpty()) {
+                    this.setOk(false);
+                    this.setMessage("Invalid account name: " + this.getAccountName());
+                    return this;
+                } else if (this.getPassword() == null || this.getPassword().isEmpty()) {
+                    this.setOk(false);
+                    this.setMessage("Invalid password: " + this.getPassword());
+                    return this;
+                } else {
+                    this.setOk(true);
+                    return this;
+                }
+            case LOGOUT:
+                if (this.getToken() == null || this.getToken().isEmpty()) {
+                    this.setOk(false);
+                    this.setMessage("Invalid token: " + this.getToken());
+                    return this;
+                } else {
+                    this.setOk(true);
+                    return this;
+                }
+            case GETRECORD:
+                if (this.getToken() == null || this.getToken().isEmpty()) {
+                    this.setOk(false);
+                    this.setMessage("Invalid token: " + this.getToken());
+                    return this;
+                } else if (this.getLayout() == null || this.getLayout().isEmpty()) {
+                    this.setOk(false);
+                    this.setMessage("Invalid layout: " + this.getLayout());
+                    return this;
+                } else if (this.getRecordId() < 1) {
+                    this.setMessage("Invalid record id: " + this.getRecordId());
+                    return this;
+                } else {
+                    this.setEndpoint(endpoint + "/layouts/" + layout + "/records/" + recordId);
+                    this.setOk(true);
+                    return this;
+                }
+            case GETRECORDS:
+                if (this.getToken() == null || this.getToken().isEmpty()) {
+                    this.setOk(false);
+                    this.setMessage("Invalid token: " + this.getToken());
+                    return this;
+                } else if (this.getLayout() == null || this.getLayout().isEmpty()) {
+                    this.setOk(false);
+                    this.setMessage("Invalid layout: " + this.getLayout());
+                    return this;
+                } else {
+                    this.setOk(true);
+                    return buildParameters(this.endpoint, this.layout, null,
+                            this.limit, this.offset, this.fmSort, this.fmPortal, this.fmScript);
+                }
+            case FINDRECORDS:
+                this.setEndpoint(endpoint + "/layouts/" + layout + "/_find");
+                return buildParameters(this.endpoint, this.layout, this.fmFind,
+                        this.limit, this.offset, this.fmSort, this.fmPortal, this.fmScript);
+
+            default:
+                return null;
         }
     }
 
@@ -151,107 +246,126 @@ public class FmRequest {
      * @param offset   the record number of the first record in the range of records
      * @param fmSort   an ArrayList of sort parameter objects
      * @param fmPortal an ArrayList of portal parameter objects
-     * @return
+     * @return the final FmRequest object
      */
-    private FmRequest build(String endpoint, String layout,
-                            @Nullable String limit,
-                            @Nullable String offset,
-                            @Nullable FmSort fmSort,
-                            @Nullable FmPortal fmPortal,
-                            @Nullable FmScript fmScript) {
+    private FmRequest buildParameters(String endpoint,
+                                      String layout,
+                                      @Nullable FmFind fmFind,
+                                      @Nullable String limit,
+                                      @Nullable String offset,
+                                      @Nullable FmSort fmSort,
+                                      @Nullable FmPortal fmPortal,
+                                      @Nullable FmScript fmScript) {
+        int type;
+        if ( this.getMethod().equals(GET)){
+            type = 1;
+        }else{
+            type = 2;
+        }
         /*------------------------------------------------------------------------------------------
         Build the URL parameters (limit/offset, sort, portal, and script params).
         ------------------------------------------------------------------------------------------*/
-        String params = "";
-        /*------------------------------------------------------------------------------------------
-        Handle limit and offset
-        ------------------------------------------------------------------------------------------*/
+        String params;
         ArrayList<String> paramsArray = new ArrayList<>();
-        if (limit != null) {
-            paramsArray.add("_limit=" + limit);
+        /*------------------------------------------------------------------------------------------
+        Build the limit parameter
+        ------------------------------------------------------------------------------------------*/
+        if ( limit != null) {
+            String limitParams = getLimitString(limit, type);
+            if (!limitParams.equals("")) {
+                paramsArray.add(limitParams);
+            }
         }
-        if (offset != null) {
-            paramsArray.add("_offset=" + offset);
+        /*------------------------------------------------------------------------------------------
+        Build the offset parameter
+        ------------------------------------------------------------------------------------------*/
+        if ( offset != null) {
+            String offsetParams = getOffsetString(offset, type);
+            if (!offsetParams.equals("")) {
+                paramsArray.add(offsetParams);
+            }
         }
         /*------------------------------------------------------------------------------------------
         Build the sort parameters
         ------------------------------------------------------------------------------------------*/
-        String sortParams = getSortString(fmSort, 1);
-        paramsArray.add(sortParams);
+        if ( fmSort != null) {
+            String sortParams = getSortString(fmSort, type);
+            if (!sortParams.equals("")) {
+                paramsArray.add(sortParams);
+            }
+        }
         /*------------------------------------------------------------------------------------------
         Build the portal parameters
         ------------------------------------------------------------------------------------------*/
-        String portalParams = getPortalString(fmPortal, 1);
-        paramsArray.add(portalParams);
+        if ( fmPortal != null) {
+            String portalParams = getPortalString(fmPortal, type);
+            if (!portalParams.equals("")) {
+                paramsArray.add(portalParams);
+            }
+        }
         /*------------------------------------------------------------------------------------------
         Build the script parameters
         ------------------------------------------------------------------------------------------*/
-        StringBuilder scriptParams = new StringBuilder();
-        if (fmScript != null) {
-            String script = fmScript.getScript();
-            String scriptParam = fmScript.getScriptParam();
-            String preRequest = fmScript.getPreRequest();
-            String preRequestParam = fmScript.getPreRequestParam();
-            String preSort = fmScript.getPreSort();
-            String preSortParam = fmScript.getPreSortParam();
-            String layoutResponse = fmScript.getLayoutReponse();
-            if (script != null) {
-                scriptParams = scriptParams.append("&script").append("=").append(Uri.encode(script));
+        if ( fmScript != null) {
+            String scriptParams = getScriptString(fmScript, type);
+            if (!scriptParams.equals("")) {
+                paramsArray.add(scriptParams);
             }
-            if (scriptParam != null) {
-                scriptParams = scriptParams.append("&script.param").append("=").append(Uri.encode(scriptParam));
-            }
-            if (preRequest != null) {
-                scriptParams = scriptParams.append("&script.prerequest").append("=").append(Uri.encode(preRequest));
-            }
-            if (preRequestParam != null) {
-                scriptParams = scriptParams.append("&script.prerequest.param").append("=").append(Uri.encode(preRequestParam));
-            }
-            if (preSort != null) {
-                scriptParams = scriptParams.append("&script.presort").append("=").append(Uri.encode(preSort));
-            }
-            if (preSortParam != null) {
-                scriptParams = scriptParams.append("&script.presort.param").append("=").append(Uri.encode(preSortParam));
-            }
-            if (layoutResponse != null) {
-                scriptParams = scriptParams.append("&layout.response").append("=").append(Uri.encode(layoutResponse));
-            }
-            paramsArray.add(scriptParams.toString());
         }
         /*------------------------------------------------------------------------------------------
-        Build the final params
+        Build the query parameters
         ------------------------------------------------------------------------------------------*/
-        if (paramsArray.size() > 0) {
+        String queryParams = getQueryString(fmFind);
+        if ( !queryParams.equals("")){
+            paramsArray.add(queryParams);
+        }
+        /*------------------------------------------------------------------------------------------
+        Build the final parameters string
+        ------------------------------------------------------------------------------------------*/
+        if ( this.fmMethod.equals(GETRECORDS) ){
             params = "?" + android.text.TextUtils.join("&", paramsArray);
-        }
-        /*------------------------------------------------------------------------------------------
-        Finalize the endpoint url
-        ------------------------------------------------------------------------------------------*/
-        if (this.fmMethod.equals(GETRECORDS)) {
             this.setEndpoint(endpoint + "/layouts/" + layout + "/records" + params);
+        } else{
+            params = "{" + android.text.TextUtils.join(",", paramsArray) + "}";
+            this.setBody(params);
         }
         return this;
     }
 
-    private FmRequest build(String endpoint, String layout,
-                            FmQuery body,
-                            @Nullable String limit,
-                            @Nullable String offset,
-                            @Nullable FmSort fmSort,
-                            @Nullable ArrayList<FmPortal> fmPortalArrayList,
-                            @Nullable FmScript fmScript) {
+    private String getLimitString(String limit, int type) {
+        if (limit == null) {
+            return "";
+        }
+        switch (type) {
+            case 1:
+                return ("_limit=" + limit);
+            case 2:
+                return ("\"limit\":\"" + limit + "\"");
+            default: return "";
+        }
+    }
 
-        return null;
+    private String getOffsetString(String offset, int type) {
+        if (offset == null) {
+            return "";
+        }
+        switch (type) {
+            case 1:
+                return ("_offset=" + offset);
+            case 2:
+                return ("\"offset\":\"" + offset + "\"");
+            default: return "";
+        }
     }
 
     /**
      * getSortString
      *
      * @param fmSort an FmSort object containing Sort objects
-     * @param type   1 for URL and 2 for body
-     * @return
+     * @param type   1 for url and 2 for body
+     * @return a string with the portal parameters for type 1 (Url) or type 2 (body)
      */
-    private String getSortString(@Nullable FmSort fmSort, int type) {
+    private String getSortString(FmSort fmSort, int type) {
         if (fmSort == null) {
             return "";
         }
@@ -276,7 +390,7 @@ public class FmRequest {
         }
     }
 
-    private String getPortalString(@Nullable FmPortal fmPortal, int type) {
+    private String getPortalString(FmPortal fmPortal, int type) {
         if (fmPortal == null) {
             return "";
         }
@@ -306,9 +420,66 @@ public class FmRequest {
         if (type == 1) {
             return "portal=[" + android.text.TextUtils.join(",", portalNames) + "]" + portalOptionalParams;
         } else {
-            // TODO: Append the type 2optional params
             return "\"portal\":[" + android.text.TextUtils.join(",", portalNames) + "]";
         }
+    }
+
+    private String getScriptString(FmScript fmScript, int type) {
+        if (fmScript == null) {
+            return "";
+        }
+        StringBuilder scriptParams = new StringBuilder();
+        String script = fmScript.getScript();
+        String scriptParam = fmScript.getScriptParam();
+        String preRequest = fmScript.getPreRequest();
+        String preRequestParam = fmScript.getPreRequestParam();
+        String preSort = fmScript.getPreSort();
+        String preSortParam = fmScript.getPreSortParam();
+        String layoutResponse = fmScript.getLayoutReponse();
+        if (script != null) {
+            scriptParams = scriptParams.append("&script").append("=").append(Uri.encode(script));
+        }
+        if (scriptParam != null) {
+            scriptParams = scriptParams.append("&script.param").append("=").append(Uri.encode(scriptParam));
+        }
+        if (preRequest != null) {
+            scriptParams = scriptParams.append("&script.prerequest").append("=").append(Uri.encode(preRequest));
+        }
+        if (preRequestParam != null) {
+            scriptParams = scriptParams.append("&script.prerequest.param").append("=").append(Uri.encode(preRequestParam));
+        }
+        if (preSort != null) {
+            scriptParams = scriptParams.append("&script.presort").append("=").append(Uri.encode(preSort));
+        }
+        if (preSortParam != null) {
+            scriptParams = scriptParams.append("&script.presort.param").append("=").append(Uri.encode(preSortParam));
+        }
+        if (layoutResponse != null) {
+            scriptParams = scriptParams.append("&layout.response").append("=").append(Uri.encode(layoutResponse));
+        }
+        return scriptParams.toString();
+    }
+
+    private String getQueryString(FmFind fmFind){
+        if ( fmFind == null ){
+            return "";
+        }
+        int countRequests = fmFind.countFindRequests();
+        if ( countRequests == 0 ){
+            return "";
+        }
+        int i = 0;
+        StringBuilder string = new StringBuilder();
+        while ( i < countRequests){
+            FmFind.FindRequest findRequest = fmFind.get(i);
+            if ( i == 0){
+                string = string.append(findRequest.getString());
+            }else{
+                string = string.append(",").append(findRequest.getString());
+            }
+            i++;
+        }
+        return "\"query\":[" + string + "]";
     }
 
     /* ---------------------------------------------------------------------------------------------
@@ -320,6 +491,10 @@ public class FmRequest {
 
     public Boolean isOk() {
         return success;
+    }
+
+    public String getMessage() {
+        return message;
     }
 
     /* ---------------------------------------------------------------------------------------------
@@ -367,13 +542,13 @@ public class FmRequest {
         this.method = method;
     }
 
-    private void setBody(String body) {
-        this.body = body;
+    private void setFmFind(FmFind fmFind) {
+        this.fmFind = fmFind;
     }
 
-    private void setBody(FmQuery body) {
+    private void setBody(String body) {
         // TODO: Convert to JSON string
-        this.body = "{}";
+        this.body = body;
     }
 
     private void setAuth(String auth) {
@@ -404,15 +579,27 @@ public class FmRequest {
         this.layout = layout;
     }
 
+    private void setRecordId(int recordId) {
+        this.recordId = recordId;
+    }
+
+    private void setMessage(String message) {
+        this.message = message;
+    }
+
     /* ---------------------------------------------------------------------------------------------
-    Package private getters
-    ----------------------------------------------------------------------------------------------*/
+        Package private getters
+        ----------------------------------------------------------------------------------------------*/
     String getEndpoint() {
         return endpoint;
     }
 
     String getMethod() {
         return method;
+    }
+
+    int getRecordId() {
+        return recordId;
     }
 
     String getBody() {
@@ -431,7 +618,11 @@ public class FmRequest {
         return password;
     }
 
-    public boolean isSSLDisabled() {
+    boolean isSSLDisabled() {
         return disableSSL;
+    }
+
+    String getLayout() {
+        return layout;
     }
 }

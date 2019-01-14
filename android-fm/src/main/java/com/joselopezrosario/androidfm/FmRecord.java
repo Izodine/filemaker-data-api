@@ -13,21 +13,21 @@ public class FmRecord {
         this.record = record;
     }
 
-    public String getRecordId(){
+    public int getRecordId(){
         try {
-            return record.getString("recordId");
+            return record.getInt("recordId");
         }catch(JSONException e){
             e.printStackTrace();
-            return null;
+            return 0;
         }
     }
 
-    public String getModId(){
+    public int getModId(){
         try {
-            return record.getString("modId");
+            return record.getInt("modId");
         }catch(JSONException e){
             e.printStackTrace();
-            return null;
+            return 0;
         }
     }
 
