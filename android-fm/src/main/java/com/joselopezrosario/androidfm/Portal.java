@@ -1,15 +1,14 @@
-package com.joselopezrosario.fm;
+package com.joselopezrosario.androidfm;
 
-public class FmPortal {
+public class Portal {
     private String name;
     private String limit;
     private String offset;
 
-
-    public FmPortal(String name, int limit, int offset) {
+    public Portal(String name) {
         this.setName(name);
-        this.setLimit(limit);
-        this.setOffset(offset);
+        this.setLimit(100);
+        this.setOffset(1);
     }
 
     /* ---------------------------------------------------------------------------------------------
@@ -31,19 +30,18 @@ public class FmPortal {
     Private setters
     ----------------------------------------------------------------------------------------------*/
 
-    private FmPortal setName(String name) {
+    private Portal setName(String name) {
         this.name = name;
         return this;
     }
 
-    private FmPortal setLimit(int limit) {
+    Portal setLimit(int limit) {
         this.limit = String.valueOf(limit);
         return this;
     }
 
-    private FmPortal setOffset(int offset) {
+    Portal setOffset(int offset) {
         this.offset = String.valueOf(offset);
         return this;
     }
-
 }

@@ -1,14 +1,14 @@
 package com.joselopezrosario.fma_sample;
 
-import com.joselopezrosario.fm.Fm;
-import com.joselopezrosario.fm.FmData;
-import com.joselopezrosario.fm.FmPortal;
-import com.joselopezrosario.fm.FmScript;
-import com.joselopezrosario.fm.FmQuery;
-import com.joselopezrosario.fm.FmRequest;
-import com.joselopezrosario.fm.FmResponse;
-import com.joselopezrosario.fm.FmRecord;
-import com.joselopezrosario.fm.FmSort;
+import com.joselopezrosario.androidfm.Fm;
+import com.joselopezrosario.androidfm.FmData;
+import com.joselopezrosario.androidfm.FmPortal;
+import com.joselopezrosario.androidfm.FmScript;
+import com.joselopezrosario.androidfm.FmQuery;
+import com.joselopezrosario.androidfm.FmRequest;
+import com.joselopezrosario.androidfm.FmResponse;
+import com.joselopezrosario.androidfm.FmRecord;
+import com.joselopezrosario.androidfm.FmSort;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -16,8 +16,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
-
-import java.util.ArrayList;
 
 @Config(manifest = Config.NONE)
 @RunWith(RobolectricTestRunner.class)
@@ -89,16 +87,14 @@ public class UnitTests {
 
     @Test
     public void getPortalData() {
-        FmPortal portalVgSales = new FmPortal(LAYOUT_VGSALES, 3, 1);
-        FmPortal portalPublishers = new FmPortal(LAYOUT_PUBLISHERS, 3, 1);
-        ArrayList<FmPortal> fmPortalArrayList = new ArrayList<>();
-        fmPortalArrayList.add(portalVgSales);
-        fmPortalArrayList.add(portalPublishers);
+        FmPortal fmPortal = new FmPortal()
+                .set(LAYOUT_VGSALES).setLimit(3).setOffset(1)
+                .set(LAYOUT_PUBLISHERS).setLimit(3).setOffset(1);
         FmRequest request = new FmRequest()
                 .getRecords(ENDPOINT, token, LAYOUT_GENRES)
                 .setLimit(10)
                 .setOffset(1)
-                .setPortalParams(fmPortalArrayList)
+                .setPortalParams(fmPortal)
                 .build();
         if (!request.isOk()) {
             assert false;

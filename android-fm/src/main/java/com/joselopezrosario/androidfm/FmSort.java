@@ -1,10 +1,8 @@
-package com.joselopezrosario.fm;
+package com.joselopezrosario.androidfm;
 
 import java.util.ArrayList;
 
 public class FmSort {
-    public static final String ASCEND = "ascend";
-    public static final String DESCEN = "descend";
     private ArrayList<Sort> sortParams;
 
     public FmSort() {
@@ -13,6 +11,7 @@ public class FmSort {
 
     /**
      * sortAsc
+     *
      * @param fieldName the field name to sort by
      * @return an FmSort object with the sort object in the sortParams ArrayList
      */
@@ -24,6 +23,7 @@ public class FmSort {
 
     /**
      * sortDesc
+     *
      * @param fieldName the field name to sort by
      * @return an FmSort object with the sort object in the sortParams ArrayList
      */
@@ -33,7 +33,12 @@ public class FmSort {
         return this;
     }
 
-    public ArrayList<Sort> getSortParams() {
+    /**
+     * getSortParams
+     *
+     * @return an ArrayList of Sort objects
+     */
+    ArrayList<Sort> getSortParams() {
         return sortParams;
     }
 

@@ -1,4 +1,4 @@
-package com.joselopezrosario.fm;
+package com.joselopezrosario.androidfm;
 
 import java.util.ArrayList;
 
@@ -8,6 +8,7 @@ public class FmQuery {
 
     /**
      * FmQuery
+     * Create a new FmQuery object and initialize the findRequests
      */
     public FmQuery() {
         this.findRequests = new ArrayList<>();
@@ -27,26 +28,27 @@ public class FmQuery {
 
     /**
      * set
-     * @param fieldName the field name
+     *
+     * @param fieldName  the field name
      * @param fieldValue the field value
      * @return an FmQuery object with the new FindRequest
      */
     public FmQuery set(String fieldName, String fieldValue) {
-        Query query = new Query(fieldName, fieldValue);
-        this.findRequests.get(this.countFoundRequests - 1).setQuery(query);
+        FieldNameValuePair fieldNameValuePair = new FieldNameValuePair(fieldName, fieldValue);
+        this.findRequests.get(this.countFoundRequests - 1).set(fieldNameValuePair);
         return this;
     }
 
-    public void omit(){
+    public void omit() {
         this.findRequests.get(this.countFoundRequests - 1).Omit();
     }
 
-    public int countFindRequests(){
+    public int countFindRequests() {
         return this.countFoundRequests;
     }
 
-    public int countQueries(){
-        if ( countFoundRequests == 0){
+    public int countQueries() {
+        if (countFoundRequests == 0) {
             return 0;
         }
         int count = 0;
@@ -65,7 +67,7 @@ public class FmQuery {
      */
     private static class FindRequest {
         int countQueries;
-        private ArrayList<Query> queries;
+        private ArrayList<FieldNameValuePair> queries;
         private boolean omit = false;
 
         private FindRequest() {
@@ -73,9 +75,10 @@ public class FmQuery {
                 this.queries = new ArrayList<>();
             }
         }
-        private FindRequest setQuery(Query query) {
+
+        private FindRequest set(FieldNameValuePair fieldNameValuePair) {
             this.countQueries = this.countQueries + 1;
-            this.queries.add(query);
+            this.queries.add(fieldNameValuePair);
             return this;
         }
 
@@ -85,14 +88,14 @@ public class FmQuery {
     }
 
     /**
-     * Query
-     * Inner class to handle the query objects in a find request
+     * FieldNameValuePair
+     * Inner class to handle the field name value pair objects in a find request
      */
-    private class Query {
+    private class FieldNameValuePair {
         private String fieldName;
         private String fieldValue;
 
-        private Query(String fieldName, String fieldValue) {
+        private FieldNameValuePair(String fieldName, String fieldValue) {
             this.fieldName = fieldName;
             this.fieldValue = fieldValue;
         }

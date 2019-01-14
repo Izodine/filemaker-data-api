@@ -1,4 +1,4 @@
-package com.joselopezrosario.fm;
+package com.joselopezrosario.androidfm;
 
 class Sort {
     private String fieldName;

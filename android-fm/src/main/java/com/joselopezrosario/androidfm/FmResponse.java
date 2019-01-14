@@ -1,4 +1,4 @@
-package com.joselopezrosario.fm;
+package com.joselopezrosario.androidfm;
 
 import org.json.JSONArray;
 import org.json.JSONException;

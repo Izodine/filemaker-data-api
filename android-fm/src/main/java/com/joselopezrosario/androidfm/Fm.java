@@ -1,4 +1,4 @@
-package com.joselopezrosario.fm;
+package com.joselopezrosario.androidfm;
 
 import android.annotation.SuppressLint;
 import android.net.Uri;

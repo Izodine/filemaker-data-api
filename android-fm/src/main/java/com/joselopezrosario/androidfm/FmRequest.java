@@ -1,4 +1,4 @@
-package com.joselopezrosario.fm;
+package com.joselopezrosario.androidfm;
 
 
 import android.net.Uri;
@@ -29,7 +29,7 @@ public class FmRequest {
     private String token;
     private String limit;
     private String offset;
-    private ArrayList<FmPortal> fmPortal;
+    private FmPortal fmPortal;
     private FmSort fmSort;
     //private ArrayList<FmSort_v1> fmSortV1;
     private FmScript fmScript;
@@ -145,19 +145,19 @@ public class FmRequest {
     }
 
     /**
-     * @param endpoint          the FileMaker Data API endpoint (ex: https://host/fmi/data/v1/databases/MyDatabase)
-     * @param layout            the layout from where to retrieve the records
-     * @param limit             the maximum number of records that should be returned
-     * @param offset            the record number of the first record in the range of records
+     * @param endpoint the FileMaker Data API endpoint (ex: https://host/fmi/data/v1/databases/MyDatabase)
+     * @param layout   the layout from where to retrieve the records
+     * @param limit    the maximum number of records that should be returned
+     * @param offset   the record number of the first record in the range of records
      * @param fmSort   an ArrayList of sort parameter objects
-     * @param fmPortalArrayList an ArrayList of portal parameter objects
+     * @param fmPortal an ArrayList of portal parameter objects
      * @return
      */
     private FmRequest build(String endpoint, String layout,
                             @Nullable String limit,
                             @Nullable String offset,
                             @Nullable FmSort fmSort,
-                            @Nullable ArrayList<FmPortal> fmPortalArrayList,
+                            @Nullable FmPortal fmPortal,
                             @Nullable FmScript fmScript) {
         /*------------------------------------------------------------------------------------------
         Build the URL parameters (limit/offset, sort, portal, and script params).
@@ -173,40 +173,16 @@ public class FmRequest {
         if (offset != null) {
             paramsArray.add("_offset=" + offset);
         }
-        // TODO: Create a method to return this data so it can be reused for GET and POST/PATCH
         /*------------------------------------------------------------------------------------------
         Build the sort parameters
         ------------------------------------------------------------------------------------------*/
         String sortParams = getSortString(fmSort, 1);
         paramsArray.add(sortParams);
-        // TODO: Create a method to return this data so it can be reused for GET and POST/PATCH
         /*------------------------------------------------------------------------------------------
         Build the portal parameters
         ------------------------------------------------------------------------------------------*/
-        String portalParams;
-        if (fmPortalArrayList != null) {
-            StringBuilder portalOptionalParams = new StringBuilder();
-            int countPortalParams = fmPortalArrayList.size();
-            String[] portalNames = new String[countPortalParams];
-            int i = 0;
-            while (countPortalParams > i) {
-                FmPortal fmPortal = fmPortalArrayList.get(i);
-                String portalName = fmPortal.getName();
-                String portalLimit = fmPortal.getLimit();
-                String portalOffset = fmPortal.getOffset();
-                portalNames[i] = "\"" + portalName + "\"";
-                if (portalLimit != null) {
-                    portalOptionalParams = portalOptionalParams.append("&_limit.").append(portalName).append("=").append(portalLimit);
-                }
-                if (portalOffset != null) {
-                    portalOptionalParams = portalOptionalParams.append("&_offset.").append(portalName).append("=").append(portalOffset);
-                }
-                i++;
-            }
-            portalParams = "portal=[" + android.text.TextUtils.join(",", portalNames) + "]" + portalOptionalParams;
-            paramsArray.add(portalParams);
-        }
-        // TODO: Create a method to return this data so it can be reused for GET and POST/PATCH
+        String portalParams = getPortalString(fmPortal, 1);
+        paramsArray.add(portalParams);
         /*------------------------------------------------------------------------------------------
         Build the script parameters
         ------------------------------------------------------------------------------------------*/
@@ -263,39 +239,75 @@ public class FmRequest {
                             @Nullable String offset,
                             @Nullable FmSort fmSort,
                             @Nullable ArrayList<FmPortal> fmPortalArrayList,
-                            @Nullable FmScript fmScript){
+                            @Nullable FmScript fmScript) {
 
         return null;
     }
 
     /**
      * getSortString
-     * @param fmSort
-     * @param type 1 for URL and 2 for body
+     *
+     * @param fmSort an FmSort object containing Sort objects
+     * @param type   1 for URL and 2 for body
      * @return
      */
-    private String getSortString(@Nullable FmSort fmSort, int type){
-        if ( fmSort == null ){
+    private String getSortString(@Nullable FmSort fmSort, int type) {
+        if (fmSort == null) {
             return "";
         }
         ArrayList<Sort> sortParams = fmSort.getSortParams();
-        if ( sortParams == null ){
+        if (sortParams == null) {
             return "";
         }
         int countSortParams = sortParams.size();
         String[] sortParamsArray = new String[countSortParams];
         int i = 0;
         while (countSortParams > i) {
-            Sort fmaSortParam = sortParams.get(i);
-            String fieldName = fmaSortParam.getFieldName();
-            String sortOrder = fmaSortParam.getSortOrder();
+            Sort sort = sortParams.get(i);
+            String fieldName = sort.getFieldName();
+            String sortOrder = sort.getSortOrder();
             sortParamsArray[i] = "{\"fieldName\":" + "\"" + fieldName + "\",\"sortOrder\":" + "\"" + sortOrder + "\"}";
             i++;
         }
-        if ( type == 1 ){
-            return  "_sort=[" + android.text.TextUtils.join(",", sortParamsArray) + "]";
-        } else{
-            return  "\"sort\":[" + android.text.TextUtils.join(",", sortParamsArray) + "]";
+        if (type == 1) {
+            return "_sort=[" + android.text.TextUtils.join(",", sortParamsArray) + "]";
+        } else {
+            return "\"sort\":[" + android.text.TextUtils.join(",", sortParamsArray) + "]";
+        }
+    }
+
+    private String getPortalString(@Nullable FmPortal fmPortal, int type) {
+        if (fmPortal == null) {
+            return "";
+        }
+        ArrayList<Portal> portalParams = fmPortal.getPortalParams();
+        if (portalParams == null) {
+            return "";
+        }
+        StringBuilder portalOptionalParams = new StringBuilder();
+        int countPortalParams = portalParams.size();
+        String[] portalNames = new String[countPortalParams];
+        int i = 0;
+        while (countPortalParams > i) {
+            Portal portal = portalParams.get(i);
+            String portalName = portal.getName();
+            String portalLimit = portal.getLimit();
+            String portalOffset = portal.getOffset();
+            portalNames[i] = "\"" + portalName + "\"";
+            // TODO: This is type 1 concatenation, need to develop type 2
+            if (portalLimit != null) {
+                portalOptionalParams = portalOptionalParams.append("&_limit.").append(portalName).append("=").append(portalLimit);
+            }
+            if (portalOffset != null) {
+                portalOptionalParams = portalOptionalParams.append("&_offset.").append(portalName).append("=").append(portalOffset);
+            }
+            i++;
+        }
+        if (type == 1) {
+            return "portal=[" + android.text.TextUtils.join(",", portalNames) + "]" + portalOptionalParams;
+        } else {
+            // TODO: Append the type 2optional params
+            return "\"portal\":[" + android.text.TextUtils.join(",", portalNames) + "]";
         }
     }
 
@@ -328,8 +340,8 @@ public class FmRequest {
         return this;
     }
 
-    public FmRequest setPortalParams(ArrayList<FmPortal> fmPortalArrayList) {
-        this.fmPortal = fmPortalArrayList;
+    public FmRequest setPortalParams(FmPortal fmPortal) {
+        this.fmPortal = fmPortal;
         return this;
     }
 
@@ -338,8 +350,8 @@ public class FmRequest {
         return this;
     }
 
-    public FmRequest setScriptPrams(FmScript fmaParamSortArrayList) {
-        this.fmScript = fmaParamSortArrayList;
+    public FmRequest setScriptPrams(FmScript fmScript) {
+        this.fmScript = fmScript;
         return this;
     }
 

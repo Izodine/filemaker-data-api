@@ -1,1 +1,1 @@
-include ':app', ':fma'
+include ':app', ':android-fm'

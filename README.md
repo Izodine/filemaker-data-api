@@ -1,4 +1,4 @@
-# Fm Library
+# Android-Fm
 
 [![Build Status](https://travis-ci.com/joselopezrosario/filemaker-data-api.svg?branch=master)](https://travis-ci.com/joselopezrosario/filemaker-data-api)
 
@@ -11,6 +11,7 @@ ___
     * FmSort: build the sort parameters
     * FmPortal: build the portal parameters
     * FmScript: build the script parameters
+    * FMQuery: build find requests
 * FmResponse: retrieve the result from the FileMaker Data API
 * FmData: parse records from the results
 * FmRecord: parse a record's field and portal data
