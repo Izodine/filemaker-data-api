@@ -11,7 +11,7 @@ ___
     * FmSort: build the sort parameters
     * FmPortal: build the portal parameters
     * FmScript: build the script parameters
-    * FMQuery: build find requests
+    * FmFind: build find requests
 * FmResponse: retrieve the result from the FileMaker Data API
 * FmData: parse records from the results
 * FmRecord: parse a record's field and portal data
@@ -27,16 +27,6 @@ Use this class to create a request object that contains:
 
 To use the FileMaker Data API, you must log in with an account that has the fmrest extended privilege enabled so you can receive a session token. All subsequent calls will require this token.
 
- ```java
-    /**
-     * login
-     * @param endpoint the FileMaker Data API endpoint (ex: https://host/fmi/data/v1/databases/MyDatabase)
-     * @param account the FileMaker account with fmrest extended privileges
-     * @param password the FileMaker account's password
-     * @return an FmRequest object
-     */
-    public FmRequest login(String endpoint, String account, String password)
-```
 **Usage:**
 ```java
     FmRequest request = new FmRequest()
@@ -51,16 +41,7 @@ To use the FileMaker Data API, you must log in with an account that has the fmre
 ### ***FmRequest.logout()***
 
 Logout from the FileMaker session and release the connection.
-
-```java
-    /**
-     * logout
-     * @param endpoint the FileMaker Data API endpoint (ex: https://host/fmi/data/v1/databases/MyDatabase)
-     * @param token the token returned in the response by executing the login request
-     * @return an FmRequest object
-     */
-    public FmRequest logout(String endpoint, String token)
-```    
+   
 **Usage:**
 ```java
     FmRequest request = new FmRequest()
@@ -71,17 +52,6 @@ Logout from the FileMaker session and release the connection.
 
 Get a foundset of records.
 
-```java
-   /**
-     * getRecords
-     *
-     * @param endpoint the FileMaker Data API endpoint (ex: https://host/fmi/data/v1/databases/MyDatabase)
-     * @param token    the token returned in the response by executing the login request
-     * @param layout   the layout from where to retrieve the records
-     * @return an FmRequest object
-     */
-    public FmRequest getRecords(String endpoint, String token, String layout)
-```
 **Usage:**
 Get the first 20 records from the vgsales layout.
 ```java
@@ -94,35 +64,28 @@ Get the first 20 records from the vgsales layout.
 ### ***FmRequest.findRecords()***
 
 Find records through one or many find criteria.
-```java
-   /**
-     * FindRecords
-     *
-     * @param endpoint the FileMaker Data API endpoint (ex: https://host/fmi/data/v1/databases/MyDatabase)
-     * @param token    the token returned in the response by executing the login request
-     * @param layout   the layout from where to retrieve the records
-     * @param body     an FmQuery object containing the find request(s)
-     * @return an FmRequest object
-     */
-    public FmRequest findRecords(String endpoint, String token, String layout, FmQuery body)
-```
-**Usage:**
-The following query finds all the games published by Nintendo in 1985, all the games published by Sega between 1991 and 1996, but it omits the games published by Sega in 1994.
+
+***To build find requests***
+The FileMaker Data API allows you to send multiple find requests in one query. The FmFind class allows you to easily build a complex query.
+
+FmFind has the following methods that you must call in order.
+
+1. `newFindRequest()` to start a new find request
+2. `set()` to set the field name value pairs (you can call this method multiple times)
+3. `omit()` to omit the records (optional: defaults to false)
+
+For example:
 
 ```java
-    FmQuery findGames = new FmQuery();
-    findGames.newFindRequest()
-        .set("Publisher","Nintendo")
-        .set("Year","1985");
-    findGames.newFindRequest()
-        .set("Publisher","Sega")
-        .set("Year","1991...1996");
-    findGames.newFindRequest()
-        .set("Publisher","Sega")
-        .set("Year","1994")
-        .omit();
+// Create a new FmFind object
+FmFind findGames = new FmFind();
+
+// Create multiple find requests by chaining newFindRequest(), set(), and optionally, omit().
+findGames.newFindRequest().set("Publisher","Nintendo").set("Year","1985");
+findGames.newFindRequest().set("Publisher","Sega").set("Year","1991...1996");
+findGames.newFindRequest().set("Publisher","Sega").set("Year","1994").omit();
 ```
-You can then pass the FmQuery object to the FmRequest.findRecords() method.
+Then pass the FmFind object to the FmRequest.findRecords() method.
 ```java
     FmRequest request = new FmRequest()
         .findRecords(ENDPOINT, token, LAYOUT_VGSALES, findGames)
@@ -130,7 +93,7 @@ You can then pass the FmQuery object to the FmRequest.findRecords() method.
 ```
 
 ---
-# Support Classes
+# Optional Parameter Classes
 Use these classes to build the optional request parameters.
 ## FmPortal
 ***To get related records***
@@ -227,31 +190,6 @@ CreationTimestamp	    Message
 01/11/2019 13:44:29	    Hello from pre-request-script
 01/11/2019 13:44:29	    Hello from pre-sort-script
 01/11/2019 13:44:29	    Hello from script
-```
-## FmQuery
-
-1/12/2019: This feature is not complete!
-https://github.com/joselopezrosario/filemaker-data-api/issues/2
-
-***To build find requests***
-The FileMaker Data API allows you to send multiple find requests in one query. This class allows you to easily create one or many find requests.
-
-FmQuery is composed of the following methods and you must call them in order.
-
-1. `newFindRequest()` to start a new find request
-2. `set()` to set the field name value pairs (you can call this method multiple times)
-3. `omit()` to omit the records (optional: defaults to false)
-
-For example:
-
-```java
-// Create a new FmQuery object
-FmQuery findGames = new FmQuery();
-
-// Create a find records by chaining newFindRequest(), set(), and omit().
-findGames.newFindRequest().set("Publisher","Nintendo").set("Year","1985");
-findGames.newFindRequest().set("Publisher","Sega").set("Year","1991...1996");
-findGames.newFindRequest().set("Publisher","Sega").set("Year","1994").omit();
 ```
 ---
 # Testing
