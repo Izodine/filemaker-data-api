@@ -12,6 +12,8 @@ public class FmResponse {
     private static final String SCRIPT_RESULT_PREREQUEST = "scriptResult.prerequest";
     private static final String SCRIPT_ERROR_PRESORT = "scriptError.presort";
     private static final String SCRIPT_RESULT_PRESORT = "scriptResult.presort";
+    private static final String RECORD_ID = "recordId";
+    private static final String MOD_ID = "modId";
     private int httpCode;
     private String httpMessage;
     private JSONObject fmResponse;
@@ -24,6 +26,8 @@ public class FmResponse {
     private String ScriptResultPreRequest;
     private int ScriptErrorPreSort;
     private String ScriptResultPreSort;
+    private int recordId;
+    private int modId;
 
 
     public FmResponse() {
@@ -163,6 +167,20 @@ public class FmResponse {
                 e.printStackTrace();
             }
         }
+        if (this.fmResponse.has(RECORD_ID)) {
+            try {
+                this.setRecordId(this.getFmResponse().getInt(RECORD_ID));
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+        if (this.fmResponse.has(MOD_ID)) {
+            try {
+                this.setModId(this.getFmResponse().getInt(MOD_ID));
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     /*------------------------------------------------------------------------------------------
@@ -174,6 +192,14 @@ public class FmResponse {
 
     JSONObject getFmResponse() {
         return fmResponse;
+    }
+
+    public int getRecordId() {
+        return recordId;
+    }
+
+    public int getModId() {
+        return modId;
     }
 
     /*------------------------------------------------------------------------------------------
@@ -212,9 +238,17 @@ public class FmResponse {
         this.ScriptResultPreSort = scriptResultPreSort;
     }
 
-    /*------------------------------------------------------------------------------------------
-    Private setters
-    ------------------------------------------------------------------------------------------*/
+    private void setRecordId(int recordId) {
+        this.recordId = recordId;
+    }
+
+    private void setModId(int modId) {
+        this.modId = modId;
+    }
+
+    /*----------------------------------------------------------------------------------------------
+        Private setters
+    ----------------------------------------------------------------------------------------------*/
     private JSONArray getFmMessageArray() {
         return fmMessageArray;
     }

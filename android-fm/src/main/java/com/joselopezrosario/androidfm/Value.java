@@ -1,8 +1,8 @@
 package com.joselopezrosario.androidfm;
 
 /**
- * FieldNameValuePair
- * Inner class to handle the field name value pair objects in a find request
+ * Value
+ * A class to manage field name value pair objects for FmFind and FmEdit objects
  */
 class Value {
     private String fieldName;
@@ -13,10 +13,10 @@ class Value {
         this.fieldValue = fieldValue;
     }
 
-    private String getString() {
-        return getFieldName() + ":" + getFieldValue();
-    }
-
+    /**
+     * getFieldName
+     * @return a JSON compatible field name string
+     */
     String getFieldName() {
         String result;
         if (this.fieldName == null) {
@@ -27,6 +27,10 @@ class Value {
         return result;
     }
 
+    /**
+     * getFieldValue
+     * @return a JSON compatible field value string
+     */
     String getFieldValue() {
         String result;
         if (this.fieldValue == null) {

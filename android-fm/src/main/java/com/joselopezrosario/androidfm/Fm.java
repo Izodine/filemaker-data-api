@@ -42,6 +42,9 @@ public final class Fm {
      * @return an FmResponse object
      */
     private static FmResponse processExecute(FmRequest request) {
+        if ( !request.isOk()){
+            return null;
+        }
         String url = request.getEndpoint();
         String method = request.getMethod();
         String body = request.getBody();

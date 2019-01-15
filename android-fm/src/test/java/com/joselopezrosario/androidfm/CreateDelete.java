@@ -1,0 +1,88 @@
+package com.joselopezrosario.androidfm;
+
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.robolectric.RobolectricTestRunner;
+import org.robolectric.annotation.Config;
+
+import java.util.concurrent.ThreadLocalRandom;
+
+@Config(manifest = Config.NONE)
+@RunWith(RobolectricTestRunner.class)
+public class CreateDelete {
+    private static final String ENDPOINT = BuildConfig.API_HOST;
+    private static final String ACCOUNT = BuildConfig.API_ACCOUNT;
+    private static final String PASSWORD = BuildConfig.API_PASSWORD;
+    private static final String LAYOUT_VGSALES = "vgsales";
+    private static final String LAYOUT_GENRES = "genres";
+    private static final String LAYOUT_PUBLISHERS = "publishers";
+    private static String token;
+
+    @BeforeClass
+    public static void startUp() {
+        FmRequest loginRequest = new FmRequest()
+                .login(ENDPOINT, ACCOUNT, PASSWORD)
+                .build();
+        if (!loginRequest.isOk()) {
+            assert false;
+            return;
+        }
+        FmResponse loginResponse = Fm.execute(loginRequest);
+        if (!loginResponse.isOk()) {
+            assert false;
+            return;
+        }
+        token = loginResponse.getToken();
+    }
+
+    /**
+     * createRecord
+     */
+    @Test
+    public void createRecord() {
+        System.out.println("-----------------------");
+        System.out.println("createRecord");
+        System.out.println("-----------------------");
+        FmEdit edit = new FmEdit()
+                .set("Rank", "999732")
+                .set("Name", "Jose's game")
+                .set("Publisher", "Lorem ipsum")
+                .set("Genre", "Arcade")
+                .set("Platform", "Nes")
+                .set("Year", "1981");
+        FmRequest request = new FmRequest()
+                .create(ENDPOINT, token, LAYOUT_VGSALES, edit)
+                .build();
+        FmResponse response = Fm.execute(request);
+        int recordId = response.getRecordId();
+        request = new FmRequest()
+                .getRecord(ENDPOINT, token, LAYOUT_VGSALES, recordId)
+                .build();
+        response = Fm.execute(request);
+        FmData fmData = new FmData().create(response);
+        UnitTestUtils.parseVgSales(fmData.getRecord(0));
+        assert response.isOk();
+
+
+    }
+
+    @AfterClass
+    public static void logout() {
+        FmRequest request = new FmRequest()
+                .logout(ENDPOINT, token)
+                .build();
+        if (!request.isOk()) {
+            assert false;
+            return;
+        }
+        FmResponse response = Fm.execute(request);
+        if (!response.isOk()) {
+            assert false;
+            return;
+        }
+        assert response.getHttpCode() == 200;
+
+    }
+}

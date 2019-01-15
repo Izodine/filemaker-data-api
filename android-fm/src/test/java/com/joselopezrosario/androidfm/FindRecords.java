@@ -41,14 +41,15 @@ public class FindRecords {
      * findRecords
      */
     @Test
-    public void findRecords(){
+    public void findRecords() {
         System.out.println("-----------------------");
         System.out.println("findRecords");
         System.out.println("-----------------------");
         FmFind findGames = new FmFind();
-        findGames.newRequest().set("Publisher","Nintendo").set("Year","1985");
-        findGames.newRequest().set("Publisher","Sega").set("Year","1991...1996");
-        findGames.newRequest().set("Publisher","Sega").set("Year","1994").omit();
+        findGames
+                .newRequest().set("Publisher", "Nintendo").set("Year", "1985")
+                .newRequest().set("Publisher", "Sega").set("Year", "1991...1996")
+                .newRequest().set("Publisher", "Sega").set("Year", "1994").omit();
         FmRequest request = new FmRequest()
                 .findRecords(ENDPOINT, token, LAYOUT_VGSALES, findGames)
                 .build();
@@ -65,16 +66,16 @@ public class FindRecords {
      * findRecordWithPortalData
      */
     @Test
-    public void findRecordWithPortalData(){
+    public void findRecordWithPortalData() {
         System.out.println("-----------------------");
         System.out.println("findRecordWithPortalData");
         System.out.println("-----------------------");
         FmFind findGames = new FmFind();
-        findGames.newRequest().set("Genre","Platform");
-        findGames.newRequest().set("Genre","Adventure");
-        findGames.newRequest().set("Genre","Puzzle");
-        findGames.newRequest().set("Genre","Simulation");
-        findGames.newRequest().set("Genre","Shooter");
+        findGames.newRequest().set("Genre", "Platform");
+        findGames.newRequest().set("Genre", "Adventure");
+        findGames.newRequest().set("Genre", "Puzzle");
+        findGames.newRequest().set("Genre", "Simulation");
+        findGames.newRequest().set("Genre", "Shooter");
         FmPortal fmPortal = new FmPortal()
                 .set(LAYOUT_VGSALES).setLimit(5000).setOffset(1);
         FmRequest request = new FmRequest()
@@ -93,12 +94,12 @@ public class FindRecords {
         FmData fmData = new FmData().create(response);
         int foundcount = fmData.size();
         System.out.println("Foundcount: " + foundcount);
-        int randomNumber = ThreadLocalRandom.current().nextInt(0, foundcount-1);
+        int randomNumber = ThreadLocalRandom.current().nextInt(0, foundcount - 1);
         System.out.println("Get record #: " + randomNumber);
         FmRecord record = fmData.getRecord(randomNumber);
         int portalSize = record.portalSize(LAYOUT_VGSALES);
         System.out.println("Record's portal size : " + portalSize);
-        randomNumber = ThreadLocalRandom.current().nextInt(0, portalSize -1);
+        randomNumber = ThreadLocalRandom.current().nextInt(0, portalSize - 1);
         System.out.println("Get portal record #: " + randomNumber);
         FmRecord portalRecord = record.getPortalRecord(LAYOUT_VGSALES, randomNumber);
         assert UnitTestUtils.parseVgSales(portalRecord);

@@ -19,6 +19,7 @@ public class FmRequest {
     private static final String GETRECORDS = "GETRECORDS";
     private static final String GETRECORD = "GETRECORD";
     private static final String FINDRECORDS = "FINDRECORDS";
+    private static final String CREATE = "CREATE";
     private boolean disableSSL;
     private String fmMethod;
     private String endpoint;
@@ -35,14 +36,13 @@ public class FmRequest {
     private FmSort fmSort;
     private FmScript fmScript;
     private FmFind fmFind;
+    private FmEdit fmEdit;
     private String body;
     private String message;
     private Boolean success;
 
     public FmRequest() {
         this.setLayout(null);
-        this.setOffset(1);
-        this.setLimit(100);
         this.setSortParams(null);
         this.setPortalParams(null);
         this.setOk(false);
@@ -143,7 +143,7 @@ public class FmRequest {
      * @param endpoint the FileMaker Data API endpoint (ex: https://host/fmi/data/v1/databases/MyDatabase)
      * @param token    the token returned in the response by executing the login request
      * @param layout   the layout from where to retrieve the records
-     * @param fmFind     an FmFind object containing the find request(s)
+     * @param fmFind   an FmFind object containing the find request(s)
      * @return an FmRequest object
      */
     public FmRequest findRecords(@NonNull String endpoint,
@@ -156,6 +156,20 @@ public class FmRequest {
         this.setLayout(layout);
         this.setMethod(POST);
         this.setFmFind(fmFind);
+        this.setAuth(BEARER);
+        return this;
+    }
+
+    public FmRequest create(@NonNull String endpoint,
+                            @NonNull String token,
+                            @NonNull String layout,
+                            @NonNull FmEdit fmEdit) {
+        this.setFmMethod(CREATE);
+        this.setEndpoint(endpoint);
+        this.setToken(token);
+        this.setLayout(layout);
+        this.setMethod(POST);
+        this.setEditParams(fmEdit);
         this.setAuth(BEARER);
         return this;
     }
@@ -227,14 +241,18 @@ public class FmRequest {
                 } else {
                     this.setOk(true);
                     return buildParameters(this.endpoint, this.layout, null,
-                            this.limit, this.offset, this.fmSort, this.fmPortal, this.fmScript);
+                            this.limit, this.offset, this.fmSort, this.fmPortal, this.fmScript, null);
                 }
             case FINDRECORDS:
                 this.setOk(true);
                 this.setEndpoint(endpoint + "/layouts/" + layout + "/_find");
                 return buildParameters(this.endpoint, this.layout, this.fmFind,
-                        this.limit, this.offset, this.fmSort, this.fmPortal, this.fmScript);
-
+                        this.limit, this.offset, this.fmSort, this.fmPortal, this.fmScript, null);
+            case CREATE:
+                this.setOk(true);
+                this.setEndpoint(endpoint + "/layouts/" + layout + "/records");
+                return buildParameters(this.endpoint, this.layout, this.fmFind,
+                        this.limit, this.offset, this.fmSort, this.fmPortal, this.fmScript, this.fmEdit);
             default:
                 return null;
         }
@@ -256,11 +274,12 @@ public class FmRequest {
                                       @Nullable String offset,
                                       @Nullable FmSort fmSort,
                                       @Nullable FmPortal fmPortal,
-                                      @Nullable FmScript fmScript) {
+                                      @Nullable FmScript fmScript,
+                                      @Nullable FmEdit fmEdit) {
         int type;
-        if ( this.getMethod().equals(GET)){
+        if (this.getMethod().equals(GET)) {
             type = 1;
-        }else{
+        } else {
             type = 2;
         }
         /*------------------------------------------------------------------------------------------
@@ -271,7 +290,7 @@ public class FmRequest {
         /*------------------------------------------------------------------------------------------
         Build the limit parameter
         ------------------------------------------------------------------------------------------*/
-        if ( limit != null) {
+        if (limit != null) {
             String limitParams = getLimitString(limit, type);
             if (!limitParams.equals("")) {
                 paramsArray.add(limitParams);
@@ -280,7 +299,7 @@ public class FmRequest {
         /*------------------------------------------------------------------------------------------
         Build the offset parameter
         ------------------------------------------------------------------------------------------*/
-        if ( offset != null) {
+        if (offset != null) {
             String offsetParams = getOffsetString(offset, type);
             if (!offsetParams.equals("")) {
                 paramsArray.add(offsetParams);
@@ -289,7 +308,7 @@ public class FmRequest {
         /*------------------------------------------------------------------------------------------
         Build the sort parameters
         ------------------------------------------------------------------------------------------*/
-        if ( fmSort != null) {
+        if (fmSort != null) {
             String sortParams = getSortString(fmSort, type);
             if (!sortParams.equals("")) {
                 paramsArray.add(sortParams);
@@ -298,7 +317,7 @@ public class FmRequest {
         /*------------------------------------------------------------------------------------------
         Build the portal parameters
         ------------------------------------------------------------------------------------------*/
-        if ( fmPortal != null) {
+        if (fmPortal != null) {
             String portalParams = getPortalString(fmPortal, type);
             if (!portalParams.equals("")) {
                 paramsArray.add(portalParams);
@@ -307,7 +326,7 @@ public class FmRequest {
         /*------------------------------------------------------------------------------------------
         Build the script parameters
         ------------------------------------------------------------------------------------------*/
-        if ( fmScript != null) {
+        if (fmScript != null) {
             String scriptParams = getScriptString(fmScript, type);
             if (!scriptParams.equals("")) {
                 paramsArray.add(scriptParams);
@@ -317,16 +336,23 @@ public class FmRequest {
         Build the query parameters
         ------------------------------------------------------------------------------------------*/
         String queryParams = getQueryString(fmFind);
-        if ( !queryParams.equals("")){
+        if (!queryParams.equals("")) {
             paramsArray.add(queryParams);
+        }
+        /*------------------------------------------------------------------------------------------
+        Build the edit parameters
+        ------------------------------------------------------------------------------------------*/
+        String editParams = getEditString(fmEdit);
+        if (!editParams.equals("")) {
+            paramsArray.add(editParams);
         }
         /*------------------------------------------------------------------------------------------
         Build the final parameters string
         ------------------------------------------------------------------------------------------*/
-        if ( this.fmMethod.equals(GETRECORDS) ){
+        if (this.fmMethod.equals(GETRECORDS)) {
             params = "?" + android.text.TextUtils.join("&", paramsArray);
             this.setEndpoint(endpoint + "/layouts/" + layout + "/records" + params);
-        } else{
+        } else {
             params = "{" + android.text.TextUtils.join(",", paramsArray) + "}";
             this.setBody(params);
         }
@@ -342,7 +368,8 @@ public class FmRequest {
                 return ("_limit=" + limit);
             case 2:
                 return ("\"limit\":\"" + limit + "\"");
-            default: return "";
+            default:
+                return "";
         }
     }
 
@@ -355,7 +382,8 @@ public class FmRequest {
                 return ("_offset=" + offset);
             case 2:
                 return ("\"offset\":\"" + offset + "\"");
-            default: return "";
+            default:
+                return "";
         }
     }
 
@@ -461,26 +489,33 @@ public class FmRequest {
         return scriptParams.toString();
     }
 
-    private String getQueryString(FmFind fmFind){
-        if ( fmFind == null ){
+    private String getQueryString(FmFind fmFind) {
+        if (fmFind == null) {
             return "";
         }
         int countRequests = fmFind.countFindRequests();
-        if ( countRequests == 0 ){
+        if (countRequests == 0) {
             return "";
         }
         int i = 0;
         StringBuilder string = new StringBuilder();
-        while ( i < countRequests){
+        while (i < countRequests) {
             FmFind.FindRequest findRequest = fmFind.get(i);
-            if ( i == 0){
+            if (i == 0) {
                 string = string.append(findRequest.getString());
-            }else{
+            } else {
                 string = string.append(",").append(findRequest.getString());
             }
             i++;
         }
         return "\"query\":[" + string + "]";
+    }
+
+    private String getEditString(FmEdit fmEdit) {
+        if (fmEdit == null) {
+            return "";
+        }
+        return "\"fieldData\":" + fmEdit.getString() + "";
     }
 
     /* ---------------------------------------------------------------------------------------------
@@ -528,6 +563,11 @@ public class FmRequest {
 
     public FmRequest setScriptPrams(FmScript fmScript) {
         this.fmScript = fmScript;
+        return this;
+    }
+
+    public FmRequest setEditParams(FmEdit fmEdit) {
+        this.fmEdit = fmEdit;
         return this;
     }
 

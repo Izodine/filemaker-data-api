@@ -74,16 +74,17 @@ FmFind has the following methods that you must call in order.
 2. `set()` to set the field name value pairs (you can call this method multiple times)
 3. `omit()` to omit the records (optional: defaults to false)
 
+You can chain the methods to create multiple find requests at once.
+
 For example:
 
 ```java
 // Create a new FmFind object
-FmFind findGames = new FmFind();
-
-// Create multiple find requests by chaining newFindRequest(), set(), and optionally, omit().
-findGames.newFindRequest().set("Publisher","Nintendo").set("Year","1985");
-findGames.newFindRequest().set("Publisher","Sega").set("Year","1991...1996");
-findGames.newFindRequest().set("Publisher","Sega").set("Year","1994").omit();
+    FmFind findGames = new FmFind();
+        findGames
+            .newRequest().set("Publisher", "Nintendo").set("Year", "1985")
+            .newRequest().set("Publisher", "Sega").set("Year", "1991...1996")
+            .newRequest().set("Publisher", "Sega").set("Year", "1994").omit();
 ```
 Then pass the FmFind object to the FmRequest.findRecords() method.
 ```java
@@ -91,7 +92,29 @@ Then pass the FmFind object to the FmRequest.findRecords() method.
         .findRecords(ENDPOINT, token, LAYOUT_VGSALES, findGames)
         .build();
 ```
+#### ***FmRequest.create()***
+Create a record. 
 
+***To set the initial values of a new record***
+Use the FmEdit class to create a new object and set the field name value pairs through the 'set()' method.
+
+For example:
+
+```java
+ FmEdit edit = new FmEdit();
+    .set("Rank", "999732")
+    .set("Name", "Jose's game")
+    .set("Publisher", "Lorem ipsum")
+    .set("Genre", "Arcade")
+    .set("Platform", "Nes")
+    .set("Year", "1981");
+```
+Then, pass the FmEdit object to the FmRequest.create() method.
+
+```java
+ FmRequest request = new FmRequest()
+    .create(ENDPOINT, token, LAYOUT_VGSALES, edit)
+    .build();
 ---
 # Optional Parameter Classes
 Use these classes to build the optional request parameters.
@@ -105,11 +128,9 @@ Then add all your FmPortal objects to an `ArrayList()`.
 
 For example:
 ```java
-    FmPortal portalVgSales = new FmPortal(LAYOUT_VGSALES, 3, 1);
-    FmPortal portalPublishers = new FmPortal(LAYOUT_PUBLISHERS, 3, 1);
-    ArrayList<FmPortal> fmaParamPortalArrayList = new ArrayList<>();
-    fmaParamPortalArrayList.add(portalVgSales);
-    fmaParamPortalArrayList.add(portalPublishers);
+    FmPortal fmPortal = new FmPortal()
+        .set(LAYOUT_VGSALES).setLimit(3).setOffset(1)
+        .set(LAYOUT_PUBLISHERS).setLimit(3).setOffset(1);
 ```
 
 Then, pass the ArrayList to the FmRequest object through the `setPortalParams()` method.
@@ -117,8 +138,6 @@ Then, pass the ArrayList to the FmRequest object through the `setPortalParams()`
 ```java
     FmRequest request = new FmRequest()
         .getRecords(ENDPOINT, token, LAYOUT_GENRES)
-        .setLimit(10)
-        .setOffset(1)
         .setPortalParams(fmaParamPortalArrayList)
         .build();
 ```
