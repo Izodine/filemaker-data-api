@@ -230,6 +230,7 @@ public class FmRequest {
                             this.limit, this.offset, this.fmSort, this.fmPortal, this.fmScript);
                 }
             case FINDRECORDS:
+                this.setOk(true);
                 this.setEndpoint(endpoint + "/layouts/" + layout + "/_find");
                 return buildParameters(this.endpoint, this.layout, this.fmFind,
                         this.limit, this.offset, this.fmSort, this.fmPortal, this.fmScript);

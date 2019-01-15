@@ -43,6 +43,16 @@ public class FmRecord {
         }
     }
 
+    public int portalSize (String portalName){
+        try {
+            JSONArray portalData = this.record.getJSONObject("portalData").getJSONArray(portalName);
+            return portalData.length();
+        }catch(JSONException e){
+            e.printStackTrace();
+            return 0;
+        }
+    }
+
     public String getValue(String fieldName){
         if ( !this.isPortalRecord ){
             try{
@@ -67,10 +77,6 @@ public class FmRecord {
     private FmRecord setPortalName(String portalName) {
         this.portalName = portalName;
         return this;
-    }
-
-    private boolean isPortalRecord() {
-        return isPortalRecord;
     }
 
     private FmRecord setIsPortalRecord() {

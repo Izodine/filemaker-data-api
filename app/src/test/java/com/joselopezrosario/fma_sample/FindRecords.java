@@ -10,6 +10,8 @@ import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
 
+import java.util.concurrent.ThreadLocalRandom;
+
 @Config(manifest = Config.NONE)
 @RunWith(RobolectricTestRunner.class)
 public class FindRecords {
@@ -38,9 +40,14 @@ public class FindRecords {
         token = loginResponse.getToken();
     }
 
+    /**
+     * findRecords
+     */
     @Test
-    // TODO: Complete the FmaRequest.findRecords() method and complete this test
     public void findRecords(){
+        System.out.println("-----------------------");
+        System.out.println("findRecords");
+        System.out.println("-----------------------");
         FmFind findGames = new FmFind();
         findGames.newRequest().set("Publisher","Nintendo").set("Year","1985");
         findGames.newRequest().set("Publisher","Sega").set("Year","1991...1996");
@@ -48,13 +55,56 @@ public class FindRecords {
         FmRequest request = new FmRequest()
                 .findRecords(ENDPOINT, token, LAYOUT_VGSALES, findGames)
                 .build();
-        System.out.println(findGames.countFindRequests());
-        System.out.println(findGames.countQueries());
         FmResponse response = Fm.execute(request);
         FmData fmData = new FmData().create(response);
+        int foundcount = fmData.size();
+        System.out.println("Foundcount: " + foundcount);
         assert findGames.countQueries() == 6 && fmData.size() > 0;
 
 
+    }
+
+    /**
+     * findRecordWithPortalData
+     */
+    @Test
+    public void findRecordWithPortalData(){
+        System.out.println("-----------------------");
+        System.out.println("findRecordWithPortalData");
+        System.out.println("-----------------------");
+        FmFind findGames = new FmFind();
+        findGames.newRequest().set("Genre","Platform");
+        findGames.newRequest().set("Genre","Adventure");
+        findGames.newRequest().set("Genre","Puzzle");
+        findGames.newRequest().set("Genre","Simulation");
+        findGames.newRequest().set("Genre","Shooter");
+        FmPortal fmPortal = new FmPortal()
+                .set(LAYOUT_VGSALES).setLimit(5000).setOffset(1);
+        FmRequest request = new FmRequest()
+                .findRecords(ENDPOINT, token, LAYOUT_GENRES, findGames)
+                .setPortalParams(fmPortal)
+                .build();
+        if (!request.isOk()) {
+            assert false;
+            return;
+        }
+        FmResponse response = Fm.execute(request);
+        if (!response.isOk()) {
+            assert false;
+            return;
+        }
+        FmData fmData = new FmData().create(response);
+        int foundcount = fmData.size();
+        System.out.println("Foundcount: " + foundcount);
+        int randomNumber = ThreadLocalRandom.current().nextInt(0, foundcount-1);
+        System.out.println("Get record #: " + randomNumber);
+        FmRecord record = fmData.getRecord(randomNumber);
+        int portalSize = record.portalSize(LAYOUT_VGSALES);
+        System.out.println("Record's portal size : " + portalSize);
+        randomNumber = ThreadLocalRandom.current().nextInt(0, portalSize -1);
+        System.out.println("Get portal record #: " + randomNumber);
+        FmRecord portalRecord = record.getPortalRecord(LAYOUT_VGSALES, randomNumber);
+        assert UnitTestUtils.parseVgSales(portalRecord);
     }
 
     @AfterClass
