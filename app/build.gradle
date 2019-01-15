@@ -19,24 +19,10 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
-    buildTypes.each {
-        def isRunningOnTravis = System.getenv("CI") == "true"
-        if (isRunningOnTravis) {
-            it.buildConfigField 'String', 'API_HOST', '"' + System.getenv("API_HOST") + '"'
-            it.buildConfigField 'String', 'API_ACCOUNT', '"' + System.getenv("API_ACCOUNT") + '"'
-            it.buildConfigField 'String', 'API_PASSWORD', '"' + System.getenv("API_PASSWORD") + '"'
-        }else{
-            it.buildConfigField 'String', 'API_HOST', API_HOST
-            it.buildConfigField 'String', 'API_ACCOUNT', API_ACCOUNT
-            it.buildConfigField 'String', 'API_PASSWORD', API_PASSWORD
-        }
-
-    }
 }
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation project(':android-fm')
     testImplementation 'junit:junit:4.12'
-    testImplementation 'org.robolectric:robolectric:4.1'
 }

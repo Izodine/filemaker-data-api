@@ -10,18 +10,32 @@ android {
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
+        debug {
+            testCoverageEnabled true
+        }
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
+        buildTypes.each {
+            def isRunningOnTravis = System.getenv("CI") == "true"
+            if (isRunningOnTravis) {
+                it.buildConfigField 'String', 'API_HOST', '"' + System.getenv("API_HOST") + '"'
+                it.buildConfigField 'String', 'API_ACCOUNT', '"' + System.getenv("API_ACCOUNT") + '"'
+                it.buildConfigField 'String', 'API_PASSWORD', '"' + System.getenv("API_PASSWORD") + '"'
+            }else{
+                it.buildConfigField 'String', 'API_HOST', API_HOST
+                it.buildConfigField 'String', 'API_ACCOUNT', API_ACCOUNT
+                it.buildConfigField 'String', 'API_PASSWORD', API_PASSWORD
+            }
+        }
     }
-
 }
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation 'com.android.support:appcompat-v7:28.0.0'
     testImplementation 'junit:junit:4.12'
-    androidTestImplementation 'com.android.support.test:runner:1.0.2'
-    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
+    testImplementation 'org.robolectric:robolectric:4.1'
+
 }

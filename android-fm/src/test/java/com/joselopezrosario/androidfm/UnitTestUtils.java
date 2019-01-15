@@ -1,6 +1,4 @@
-package com.joselopezrosario.fma_sample;
-
-import com.joselopezrosario.androidfm.*;
+package com.joselopezrosario.androidfm;
 
 class UnitTestUtils {
     static boolean parseVgSales(FmRecord record) {

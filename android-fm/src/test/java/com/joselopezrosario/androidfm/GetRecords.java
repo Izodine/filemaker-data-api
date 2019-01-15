@@ -1,6 +1,4 @@
-package com.joselopezrosario.fma_sample;
-
-import com.joselopezrosario.androidfm.*;
+package com.joselopezrosario.androidfm;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
