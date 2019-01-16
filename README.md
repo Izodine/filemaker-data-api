@@ -115,6 +115,7 @@ Then, pass the FmEdit object to the FmRequest.create() method.
  FmRequest request = new FmRequest()
     .create(ENDPOINT, token, LAYOUT_VGSALES, edit)
     .build();
+ ```
 ---
 # Optional Parameter Classes
 Use these classes to build the optional request parameters.
