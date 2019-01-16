@@ -45,8 +45,7 @@ public class FindRecords {
         System.out.println("-----------------------");
         System.out.println("findRecords");
         System.out.println("-----------------------");
-        FmFind findGames = new FmFind();
-        findGames
+        FmFind findGames = new FmFind()
                 .newRequest().set("Publisher", "Nintendo").set("Year", "1985")
                 .newRequest().set("Publisher", "Sega").set("Year", "1991...1996")
                 .newRequest().set("Publisher", "Sega").set("Year", "1994").omit();
@@ -77,7 +76,7 @@ public class FindRecords {
         findGames.newRequest().set("Genre", "Simulation");
         findGames.newRequest().set("Genre", "Shooter");
         FmPortal fmPortal = new FmPortal()
-                .set(LAYOUT_VGSALES).setLimit(5000).setOffset(1);
+                .setName(LAYOUT_VGSALES).setLimit(5000).setOffset(1);
         FmRequest request = new FmRequest()
                 .findRecords(ENDPOINT, token, LAYOUT_GENRES, findGames)
                 .setPortalParams(fmPortal)
@@ -102,7 +101,7 @@ public class FindRecords {
         randomNumber = ThreadLocalRandom.current().nextInt(0, portalSize - 1);
         System.out.println("Get portal record #: " + randomNumber);
         FmRecord portalRecord = record.getPortalRecord(LAYOUT_VGSALES, randomNumber);
-        assert UnitTestUtils.parseVgSales(portalRecord);
+        assert TestUtils.parseVgSales(portalRecord);
     }
 
     @AfterClass

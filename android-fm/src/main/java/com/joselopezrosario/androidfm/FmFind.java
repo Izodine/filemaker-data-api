@@ -12,7 +12,7 @@ public class FmFind {
 
     /**
      * FmFind
-     * Create a new FmFind object and initialize the findRequests ArrayList
+     * Create a new FmFind object and initialize its findRequests ArrayList
      */
     public FmFind() {
         this.findRequests = new ArrayList<>();
@@ -29,9 +29,11 @@ public class FmFind {
         this.countFoundRequests = this.findRequests.size();
         return this;
     }
-
+    /*----------------------------------------------------------------------------------------------
+    Public setters
+    ----------------------------------------------------------------------------------------------*/
     /**
-     * set
+     * setName
      * Set the find request field values
      * @param fieldName  the field name
      * @param fieldValue the field value
@@ -47,16 +49,21 @@ public class FmFind {
      * omit
      * Optional method to sets the omit value to true
      */
-    public void omit() {
+    public FmFind omit() {
         this.findRequests.get(this.countFoundRequests - 1).omit();
+        return this;
     }
 
+    /*----------------------------------------------------------------------------------------------
+    Package private getters
+    ----------------------------------------------------------------------------------------------*/
+
     /**
-     * countEditValues
+     * countValues
      * Count the FindRequest objects in the ArrayList and return the number
      * @return the number of FindRequest objects
      */
-    public int countFindRequests() {
+    int countFindRequests() {
         return this.countFoundRequests;
     }
 
@@ -66,7 +73,7 @@ public class FmFind {
      * @param index the find request's index in the ArrayList
      * @return a FindRequest object
      */
-    public FindRequest get(int index) {
+    FindRequest get(int index) {
         return this.findRequests.get(index);
     }
 
@@ -75,7 +82,7 @@ public class FmFind {
      * Count the number of Value objects across all find requests in the ArrayList
      * @return the number of Value objects across all FindRequests
      */
-    public int countQueries() {
+    int countQueries() {
         if (countFoundRequests == 0) {
             return 0;
         }
@@ -109,7 +116,7 @@ public class FmFind {
         }
 
         /**
-         * set
+         * setName
          * Set a new value object
          * @param values a Value object
          */

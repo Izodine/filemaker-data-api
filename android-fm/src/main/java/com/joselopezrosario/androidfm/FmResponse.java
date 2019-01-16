@@ -119,7 +119,7 @@ public class FmResponse {
 
     /**
      * setFmResponse
-     * Set the response, and parse out and set the message and script responses into their own fields
+     * Set the response, and parse out and setName the message and script responses into their own fields
      *
      * @param fmResponse an FmResponse object
      */

@@ -11,14 +11,14 @@ public class FmEdit {
 
     /**
      * FmEdit
-     * Create a new FmFind object and initialize the values ArrayList
+     * Create a new FmFind object and initialize its values ArrayList
      */
     public FmEdit() {
         this.values = new ArrayList<>();
     }
 
     /**
-     * set
+     * setName
      * Create a new Value object with the field name and value and store it it in the values ArrayList
      *
      * @param fieldName  the field name
@@ -32,12 +32,12 @@ public class FmEdit {
     }
 
     /**
-     * countEditValues
+     * countValues
      * Count the Value objects in the values ArrayList and return the number
      *
      * @return the number of Value objects
      */
-    public int countEditValues() {
+    public int countValues() {
         if (values != null) {
             return this.values.size();
         } else {
@@ -52,7 +52,7 @@ public class FmEdit {
      * @param index the value's index in the ArrayList
      * @return a Value object
      */
-    public Value get(int index) {
+    Value get(int index) {
         return this.values.get(index);
     }
 

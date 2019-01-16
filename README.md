@@ -1,105 +1,150 @@
 # Android-Fm
 
-[![Build Status](https://travis-ci.com/joselopezrosario/filemaker-data-api.svg?branch=master)](https://travis-ci.com/joselopezrosario/filemaker-data-api)
+[![Build Status](https://travis-ci.com/joselopezrosario/filemaker-data-api.svg?branch=master)](https://travis-ci.com/joselopezrosario/filemaker-data-api) [![Download](https://api.bintray.com/packages/joselopezrosario/maven/android-fm/images/download.svg)](https://bintray.com/joselopezrosario/maven/android-fm/_latestVersion)
 
 An Android library to seamlessly interact with databases hosted on FileMaker Server 17+ through the Data API.
+
+___
+# Installation
+
+Add the repository to your project's build.gradle file.
+
+```groovy
+repositories {
+    maven {
+        url  "https://dl.bintray.com/joselopezrosario/maven"
+    }
+}
+```
+
+Add the dependency to your application's build.gradle file.
+
+```groovy
+    implementation 'com.joselopezrosario:android-fm:0.0.1'
+```
+___
+# About the following examples
+
+The variable `url` is your host and database. You don't need to pass any additional parameters like `sessions` or `layout` in the url.
+
+This is all you need `https://yourHost/fmi/data/v1/databases/yourDatabase`
 ___
 # Classes
 
-* FmRequest: create an API request via instance methods
-* Fm: execute the API request against the FileMaker Data API
-    * FmSort: build the sort parameters
-    * FmPortal: build the portal parameters
-    * FmScript: build the script parameters
-    * FmFind: build find requests
-* FmResponse: retrieve the result from the FileMaker Data API
-* FmData: parse records from the results
-* FmRecord: parse a record's field and portal data
+* **FmRequest** to create API requests via instance methods
+    * *FmRequest support classes*
+        * **FmSort** to build sort parameters
+        * **FmPortal** to build portal parameters
+        * **FmScript** to build script parameters
+        * **FmFind** to build find requests
+        * **FmEdit** to build field name value parameters for create and edit
+* **Fm** to execute the API request against the FileMaker Data API
+* **FmResponse** to retrieve the response from the FileMaker Data API
+* **FmData** to get the foundset from a response
+* **FmRecord** to parse a record's field and portal data
 ---
 ## FmRequest
 Use this class to create a request object that contains:
 
-* The information required by the API - like the endpoint url, credentials, and body
-* Other optional information - like the sort, portal, and script parameters
+* The information required by the API - like the url, credentials, and body
+* Other optional information created through support classes - like the sort, portal, and script parameters
 
-### Methods
-#### ***FmRequest.login()***
+#### login(url, account, password)
+***To log in to FileMaker and receive a token***
 
 To use the FileMaker Data API, you must log in with an account that has the fmrest extended privilege enabled so you can receive a session token. All subsequent calls will require this token.
 
 **Usage:**
 ```java
+    // Create a request object, call the login method, and build it
     FmRequest request = new FmRequest()
-            .login(URL, ACCOUNT, PASSWORD)
+            .login(url, account, password)
             .build();
-            
-    // Execute the request and get the token
+    // Pass the request to Fm.execute() to receive a response
     FmResponse response = Fm.execute(request);
+    // Use the getToken() method to get the token
     String token = response.getToken();
 ```
 
-### ***FmRequest.logout()***
+#### logout(url, token)
 
-Logout from the FileMaker session and release the connection.
+***To logout from the FileMaker session and release the connection***
    
 **Usage:**
 ```java
     FmRequest request = new FmRequest()
-        .logout(URL, token)
+        .logout(url, token)
         .build();
 ```
-### ***FmRequest.getRecords()***
+### getRecords(url, token, layout)
 
-Get a foundset of records.
+***To get a foundset of records***
+
+For example, to get 20 records starting from the 10th record.
 
 **Usage:**
-Get the first 20 records from the vgsales layout.
 ```java
     FmRequest request = new FmRequest()
-        .getRecords(ENDPOINT, token, LAYOUT_VGSALES)
+        .getRecords(url, token, "vgsales")
+        .setOffset(10)
         .setLimit(20)
-        .setOffset(1)
         .build();
 ```
-### ***FmRequest.findRecords()***
 
-Find records through one or many find criteria.
 
-***To build find requests***
-The FileMaker Data API allows you to send multiple find requests in one query. The FmFind class allows you to easily build a complex query.
+### getRecord(url, token, layout, recordId)
+***To get a specific record by its id***
 
-FmFind has the following methods that you must call in order.
+For example, to get record id 100.
+```java
+    FmRequest request = new FmRequest()
+        .getRecord(url, token, "vgsales", 100)
+        .build();
+```
 
-1. `newFindRequest()` to start a new find request
+
+### findRecords(url, token, layout, fmFind)
+***To find records by one or multiple criteria***
+
+Use the FmFind class to easily build complex queries. FmFind has the following methods that you must call in order.
+
+1. `newRequest()` to start a new find request
 2. `set()` to set the field name value pairs (you can call this method multiple times)
 3. `omit()` to omit the records (optional: defaults to false)
 
-You can chain the methods to create multiple find requests at once.
+You can chain the methods to create multiple find requests at once. 
 
-For example:
+This example shows how to to find all the games published by Nintendo in 1985, and all games published by Sega between 1991 and 1996, but it omits the games puiblished by Sega in 1994.
+
+**Usage:**
 
 ```java
-// Create a new FmFind object
-    FmFind findGames = new FmFind();
-        findGames
-            .newRequest().set("Publisher", "Nintendo").set("Year", "1985")
-            .newRequest().set("Publisher", "Sega").set("Year", "1991...1996")
-            .newRequest().set("Publisher", "Sega").set("Year", "1994").omit();
+    FmFind fmFind = new FmFind()
+        .newRequest().set("Publisher", "Nintendo").set("Year", "1985")
+        .newRequest().set("Publisher", "Sega").set("Year", "1991...1996")
+        .newRequest().set("Publisher", "Sega").set("Year", "1994").omit();
 ```
 Then pass the FmFind object to the FmRequest.findRecords() method.
 ```java
     FmRequest request = new FmRequest()
-        .findRecords(ENDPOINT, token, LAYOUT_VGSALES, findGames)
+        .findRecords(url, token, "vgsales", fmFind)
         .build();
 ```
-#### ***FmRequest.create()***
-Create a record. 
+#### create(url, token, layout)
+***To create a blank record.***
 
-***To set the initial values of a new record***
-Use the FmEdit class to create a new object and set the field name value pairs through the 'set()' method.
+**Usage**:
+```java
+ FmRequest request = new FmRequest()
+    .create(url, token, "vgsales")
+    .build();
+ ```
+#### create(url, token, layout, fmEdit)
+***To create a record with values***
 
-For example:
+To set the initial values use the FmEdit class. Set the name of the field and its value through the `set()` method.
 
+**Usage**:
 ```java
  FmEdit edit = new FmEdit();
     .set("Rank", "999732")
@@ -108,46 +153,36 @@ For example:
     .set("Genre", "Arcade")
     .set("Platform", "Nes")
     .set("Year", "1981");
-```
-Then, pass the FmEdit object to the FmRequest.create() method.
-
-```java
  FmRequest request = new FmRequest()
-    .create(ENDPOINT, token, LAYOUT_VGSALES, edit)
+    .create(url, token, "vgsales", fmEdit)
     .build();
  ```
 ---
-# Optional Parameter Classes
+# Optional Support Classes
 Use these classes to build the optional request parameters.
 ## FmPortal
 ***To get related records***
 This example shows how to get the first 10 records from the genres layout, and for each genre record, to get the first 3 related vgsales records, and the first 3 related publisher records.
 
-You will set the portal name, limit, and offset via FmPortal objects. Create them using this constructor: `FmPortal(String name, int limit, int offset)`
-
-Then add all your FmPortal objects to an `ArrayList()`.
+Create an FmPortal object and call the `setName()`, `setLimit()` and `setOffset()` methods.
 
 For example:
 ```java
     FmPortal fmPortal = new FmPortal()
-        .set(LAYOUT_VGSALES).setLimit(3).setOffset(1)
-        .set(LAYOUT_PUBLISHERS).setLimit(3).setOffset(1);
+        .setName(LAYOUT_VGSALES).setLimit(3).setOffset(1)
+        .setName(LAYOUT_PUBLISHERS).setLimit(3).setOffset(1);
 ```
-
-Then, pass the ArrayList to the FmRequest object through the `setPortalParams()` method.
-
+Then pass the FmPortal object to your FmRequest through the `setPortalParams()` method.
 ```java
     FmRequest request = new FmRequest()
-        .getRecords(ENDPOINT, token, LAYOUT_GENRES)
-        .setPortalParams(fmaParamPortalArrayList)
+        .getRecords(url, token, "vgsales")
+        .setPortalParams(fmPortal)
         .build();
 ```
 ## FmSort
 
 ***To sort records***
-The FileMaker Data API allows you to sort records by multiple fields in ascending or descending order.
-
-This example shows you how to get the first 1,000 records from the vgsales layout and sort them by genre ascending and rank descending. 
+The FileMaker Data API allows you to sort records by multiple fields in ascending or descending order. This example shows you how to get the first 1,000 records from the vgsales layout and sort them by genre ascending and rank descending. 
 
 First, build an FmSort object and call the `sortAsc()` and `sortDesc()` methods with the names of the fields you want to sort by.
 
@@ -156,11 +191,11 @@ First, build an FmSort object and call the `sortAsc()` and `sortDesc()` methods 
         .sortAsc("Genre")
         .sortDesc("Rank");
 ```
-Then, pass it to the FmRequest object.
+Then, pass it to the FmRequest object through the `sortParams()` method.
 
 ```java    
     FmRequest request = new FmRequest()
-        .getRecords(ENDPOINT, token, LAYOUT_VGSALES)
+        .getRecords(url, token, "vgsales")
         .setLimit(1000)
         .setOffset(1)
         .setSortParams(fmSort)
@@ -169,42 +204,39 @@ Then, pass it to the FmRequest object.
 ## FmScript
 
 ***To call scripts***
-This example shows how to run scripts. The FileMaker Data API has three options for running scripts.
+The FileMaker Data API has three options for running scripts:
 
 1. **script**: runs after the action and sort are executed
 2. **script pre-request**: runs before the action and sort are executed
 3. **script pre-sort**: runs after executing the request but before sorting the records
 
-You can set these options through an FmScript object. Create the object using this constructor `FmScript()`. 
+You can set these options through an FmScript object. Create the object using this constructor `FmScript()`.  Then set the options using the following methods:
 
-Set the options using the following methods:
+* `setScript()` - sets the script name
+* `setScriptParam()` - sets the script parameter
+* `setPreRequest()` - sets the pre-request script name
+* `setPreRequestParam()` - sets the pre-request script paramter
+* `setPreSort()` - sets the pre-sort script name
+* `setPreSortParam()` - sets the pre-sort script paramter
+* `setLayoutResponse()` - the layout to switch to when processing the response
 
-* `setScript(String script)` - sets the script name
-* `setScriptParam(String scriptParam)` - sets the script parameter
-* `setPreRequest(String preRequest)` - sets the pre-request script name
-* `setPreRequestParam(String preRequestParam)` - sets the pre-request script paramter
-* `setPreSort(String preSort)` - sets the pre-sort script name
-* `setPreSortParam(String preSortParam)` - sets the pre-sort script paramter
+For example, the VideoGameSales FileMaker databases has a script named log that goes to the log layout, creates a new record, and sets the Message field with the value of the script parameter. We can create an FmScript object to run the `log` script using the three options.
 
-For example, the VideoGameSales FileMaker databases has a `log` script that goes to the `log` layout, creates a new record, and sets the `Message` field with the value of the script parameter. We can create an FmScript object to run the `log` script using the three options.
-
+**Usage**:
 ```java
     FmScript script = new FmScript()
-        .setScript("log").setScriptParam("Hello from script")
         .setPreRequest("log").setPreRequestParam("Hello from pre-request script")
         .setPreSort("log").setPreSortParam("Hello from pre-sort script")
-        .setLayoutReponse(LAYOUT_VGSALES);
+        .setScript("log").setScriptParam("Hello from script")
 ```
 And then pass it to the FmRequest object through the `setScriptParams()` method.
 ```java
     FmRequest request = new FmRequest()
-        .getRecords(ENDPOINT, token, LAYOUT_VGSALES)
-        .setLimit(10)
-        .setOffset(1)
+        .getRecords(url, token, "vgsales")
         .setScriptPrams(script)
         .build();
 ```
-After executing the request, the script creates the following records in the `log` table.
+After executing the request, the script creates the following records in the log table.
 ```
 CreationTimestamp	    Message
 01/11/2019 13:44:29	    Hello from pre-request-script

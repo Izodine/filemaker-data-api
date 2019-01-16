@@ -1,5 +1,5 @@
 # Add project specific ProGuard rules here.
-# You can control the set of applied configuration files using the
+# You can control the setName of applied configuration files using the
 # proguardFiles setting in buildGet.gradle.
 #
 # For more details, see

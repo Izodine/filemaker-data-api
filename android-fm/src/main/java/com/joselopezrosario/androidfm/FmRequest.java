@@ -54,17 +54,17 @@ public class FmRequest {
     /**
      * login
      *
-     * @param endpoint the FileMaker Data API endpoint (ex: https://host/fmi/data/v1/databases/MyDatabase)
+     * @param url      the FileMaker Data API url (ex: https://host/fmi/data/v1/databases/MyDatabase)
      * @param account  the FileMaker account with fmrest extended privileges
      * @param password the FileMaker account's password
      * @return an FmRequest object
      */
-    public FmRequest login(@NonNull String endpoint,
+    public FmRequest login(@NonNull String url,
                            @NonNull String account,
                            @NonNull String password) {
-        String url = endpoint + "/sessions";
+        String endpoint = url + "/sessions";
         this.setFmMethod(LOGIN);
-        this.setEndpoint(url);
+        this.setEndpoint(endpoint);
         this.setMethod(POST);
         this.setAccountName(account);
         this.setPassword(password);
@@ -76,15 +76,15 @@ public class FmRequest {
     /**
      * logout
      *
-     * @param endpoint the FileMaker Data API endpoint (ex: https://host/fmi/data/v1/databases/MyDatabase)
-     * @param token    the token returned in the response by executing the login request
+     * @param url   the FileMaker Data API url (ex: https://host/fmi/data/v1/databases/MyDatabase)
+     * @param token the token returned in the response by executing the login request
      * @return an FmRequest object
      */
-    public FmRequest logout(@NonNull String endpoint,
+    public FmRequest logout(@NonNull String url,
                             @NonNull String token) {
-        String url = endpoint + "/sessions/" + token;
+        String endpoint = url + "/sessions/" + token;
         this.setFmMethod(LOGOUT);
-        this.setEndpoint(url);
+        this.setEndpoint(endpoint);
         this.setMethod(DELETE);
         this.setToken(token);
         this.setBody(EMPTY_BODY);
@@ -95,16 +95,16 @@ public class FmRequest {
     /**
      * getRecords
      *
-     * @param endpoint the FileMaker Data API endpoint (ex: https://host/fmi/data/v1/databases/MyDatabase)
-     * @param token    the token returned in the response by executing the login request
-     * @param layout   the layout from where to retrieve the records
+     * @param url    the FileMaker Data API url (ex: https://host/fmi/data/v1/databases/MyDatabase)
+     * @param token  the token returned in the response by executing the login request
+     * @param layout the layout from where to retrieve the records
      * @return an FmRequest object
      */
-    public FmRequest getRecords(@NonNull String endpoint,
+    public FmRequest getRecords(@NonNull String url,
                                 @NonNull String token,
                                 @NonNull String layout) {
         this.setFmMethod(GETRECORDS);
-        this.setEndpoint(endpoint);
+        this.setEndpoint(url);
         this.setToken(token);
         this.setLayout(layout);
         this.setMethod(GET);
@@ -116,18 +116,18 @@ public class FmRequest {
     /**
      * getRecords
      *
-     * @param endpoint the FileMaker Data API endpoint (ex: https://host/fmi/data/v1/databases/MyDatabase)
-     * @param token    the token returned in the response by executing the login request
-     * @param layout   the layout from where to retrieve the records
+     * @param url    the FileMaker Data API url (ex: https://host/fmi/data/v1/databases/MyDatabase)
+     * @param token  the token returned in the response by executing the login request
+     * @param layout the layout from where to retrieve the records
      * @return an FmRequest object
      */
-    public FmRequest getRecord(@NonNull String endpoint,
+    public FmRequest getRecord(@NonNull String url,
                                @NonNull String token,
                                @NonNull String layout,
                                @NonNull int recordId) {
         this.setFmMethod(GETRECORD);
         this.setRecordId(recordId);
-        this.setEndpoint(endpoint);
+        this.setEndpoint(url);
         this.setToken(token);
         this.setLayout(layout);
         this.setMethod(GET);
@@ -140,18 +140,18 @@ public class FmRequest {
     /**
      * FindRecords
      *
-     * @param endpoint the FileMaker Data API endpoint (ex: https://host/fmi/data/v1/databases/MyDatabase)
-     * @param token    the token returned in the response by executing the login request
-     * @param layout   the layout from where to retrieve the records
-     * @param fmFind   an FmFind object containing the find request(s)
+     * @param url    the FileMaker Data API url (ex: https://host/fmi/data/v1/databases/MyDatabase)
+     * @param token  the token returned in the response by executing the login request
+     * @param layout the layout from where to retrieve the records
+     * @param fmFind an FmFind object containing the find request(s)
      * @return an FmRequest object
      */
-    public FmRequest findRecords(@NonNull String endpoint,
+    public FmRequest findRecords(@NonNull String url,
                                  @NonNull String token,
                                  @NonNull String layout,
                                  @NonNull FmFind fmFind) {
         this.setFmMethod(FINDRECORDS);
-        this.setEndpoint(endpoint);
+        this.setEndpoint(url);
         this.setToken(token);
         this.setLayout(layout);
         this.setMethod(POST);
@@ -160,16 +160,28 @@ public class FmRequest {
         return this;
     }
 
-    public FmRequest create(@NonNull String endpoint,
+    public FmRequest create(@NonNull String url,
                             @NonNull String token,
                             @NonNull String layout,
                             @NonNull FmEdit fmEdit) {
         this.setFmMethod(CREATE);
-        this.setEndpoint(endpoint);
+        this.setEndpoint(url);
         this.setToken(token);
         this.setLayout(layout);
         this.setMethod(POST);
         this.setEditParams(fmEdit);
+        this.setAuth(BEARER);
+        return this;
+    }
+
+    public FmRequest create(@NonNull String url,
+                            @NonNull String token,
+                            @NonNull String layout) {
+        this.setFmMethod(CREATE);
+        this.setEndpoint(url);
+        this.setToken(token);
+        this.setLayout(layout);
+        this.setMethod(POST);
         this.setAuth(BEARER);
         return this;
     }
@@ -179,7 +191,7 @@ public class FmRequest {
      * build
      * Make sure that all required parameters are valid before returning the final request object.
      * If there's an error, the request success field (accessed through isOk()) will return false.
-     * Additional informational about the error will be set in the message field (accessed through getMessage()).
+     * Additional informational about the error will be setName in the message field (accessed through getMessage()).
      *
      * @return an FmRequest object
      */

@@ -68,7 +68,7 @@ public class GetRecords {
         int randomNum = ThreadLocalRandom.current().nextInt(0, max);
         System.out.println("Random record: " + randomNum);
         FmRecord record = fmData.getRecord(randomNum);
-        assert UnitTestUtils.parseVgSales(record);
+        assert TestUtils.parseVgSales(record);
     }
 
     /**
@@ -110,7 +110,7 @@ public class GetRecords {
         response = Fm.execute(request);
         fmData = new FmData().create(response);
         record = fmData.getRecord(0);
-        assert UnitTestUtils.parseVgSales(record);
+        assert TestUtils.parseVgSales(record);
 
     }
 
@@ -120,8 +120,8 @@ public class GetRecords {
         System.out.println("getRecordPortalData");
         System.out.println("-----------------------");
         FmPortal fmPortal = new FmPortal()
-                .set(LAYOUT_VGSALES).setLimit(3).setOffset(1)
-                .set(LAYOUT_PUBLISHERS).setLimit(3).setOffset(1);
+                .setName(LAYOUT_VGSALES).setLimit(3).setOffset(1)
+                .setName(LAYOUT_PUBLISHERS).setLimit(3).setOffset(1);
         FmRequest request = new FmRequest()
                 .getRecords(ENDPOINT, token, LAYOUT_GENRES)
                 .setLimit(100)
@@ -145,7 +145,7 @@ public class GetRecords {
         randomNumber = ThreadLocalRandom.current().nextInt(0, 2);
         FmRecord portalRecord = record.getPortalRecord(LAYOUT_VGSALES, randomNumber);
         System.out.println("Portal record #: " + randomNumber);
-        assert UnitTestUtils.parseVgSales(portalRecord);
+        assert TestUtils.parseVgSales(portalRecord);
     }
 
     @Test

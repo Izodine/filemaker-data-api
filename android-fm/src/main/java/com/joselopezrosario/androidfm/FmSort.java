@@ -2,13 +2,23 @@ package com.joselopezrosario.androidfm;
 
 import java.util.ArrayList;
 
+/**
+ * FmSort
+ * A class to handle creating sort parameters
+ */
 public class FmSort {
     private ArrayList<Sort> sortParams;
 
+    /**
+     * FmSort
+     * Create an FmSort object and initialize its sortParams ArrayList
+     */
     public FmSort() {
         this.sortParams = new ArrayList<>();
     }
-
+   /*----------------------------------------------------------------------------------------------
+    Public setters
+    ----------------------------------------------------------------------------------------------*/
     /**
      * sortAsc
      *
@@ -32,7 +42,9 @@ public class FmSort {
         this.sortParams.add(sort);
         return this;
     }
-
+   /*----------------------------------------------------------------------------------------------
+    Package private getters
+    ----------------------------------------------------------------------------------------------*/
     /**
      * getSortParams
      *

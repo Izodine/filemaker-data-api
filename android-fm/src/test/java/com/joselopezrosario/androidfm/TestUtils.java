@@ -1,6 +1,6 @@
 package com.joselopezrosario.androidfm;
 
-class UnitTestUtils {
+class TestUtils {
     static boolean parseVgSales(FmRecord record) {
         int recId = record.getRecordId();
         int modId = record.getModId();

@@ -1,5 +1,9 @@
 package com.joselopezrosario.androidfm;
 
+/**
+ * FmScript
+ * A class to handle creating script parameters
+ */
 public class FmScript {
     private String script;
     private String scriptParam;
@@ -9,8 +13,11 @@ public class FmScript {
     private String preSortParam;
     private String layoutReponse;
 
+    /**
+     * FmScript
+     * Create a new FmScript parameter object
+     */
     public FmScript() {
-
     }
 
     /*----------------------------------------------------------------------------------------------
@@ -52,34 +59,34 @@ public class FmScript {
         return this;
     }
     /*----------------------------------------------------------------------------------------------
-    Public setters
+    Package private setters
     ----------------------------------------------------------------------------------------------*/
 
-    public String getScript() {
+    String getScript() {
         return script;
     }
 
-    public String getScriptParam() {
+    String getScriptParam() {
         return scriptParam;
     }
 
-    public String getPreRequest() {
+    String getPreRequest() {
         return preRequest;
     }
 
-    public String getPreRequestParam() {
+    String getPreRequestParam() {
         return preRequestParam;
     }
 
-    public String getPreSort() {
+    String getPreSort() {
         return preSort;
     }
 
-    public String getPreSortParam() {
+    String getPreSortParam() {
         return preSortParam;
     }
 
-    public String getLayoutReponse() {
+    String getLayoutReponse() {
         return layoutReponse;
     }
 }

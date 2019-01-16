@@ -7,8 +7,6 @@ import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
 
-import java.util.concurrent.ThreadLocalRandom;
-
 @Config(manifest = Config.NONE)
 @RunWith(RobolectricTestRunner.class)
 public class CreateDelete {
@@ -37,13 +35,25 @@ public class CreateDelete {
         token = loginResponse.getToken();
     }
 
+    @Test
+    public void createBlankRecord(){
+        System.out.println("-----------------------");
+        System.out.println("createBlankRecord");
+        System.out.println("-----------------------");
+        FmRequest request = new FmRequest()
+                .create(ENDPOINT, token, LAYOUT_VGSALES)
+                .build();
+        FmResponse response = Fm.execute(request);
+        assert response.isOk();
+    }
+
     /**
-     * createRecord
+     * createRecordAndSetValues
      */
     @Test
-    public void createRecord() {
+    public void createRecordAndSetValues() {
         System.out.println("-----------------------");
-        System.out.println("createRecord");
+        System.out.println("createRecordAndSetValues");
         System.out.println("-----------------------");
         FmEdit edit = new FmEdit()
                 .set("Rank", "999732")
@@ -62,7 +72,7 @@ public class CreateDelete {
                 .build();
         response = Fm.execute(request);
         FmData fmData = new FmData().create(response);
-        UnitTestUtils.parseVgSales(fmData.getRecord(0));
+        TestUtils.parseVgSales(fmData.getRecord(0));
         assert response.isOk();
 
 
