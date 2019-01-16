@@ -1,4 +1,7 @@
 apply plugin: 'com.android.library'
+apply plugin: 'com.github.dcendents.android-maven'
+apply plugin: 'com.jfrog.bintray'
+
 android {
     compileSdkVersion 28
     defaultConfig {
@@ -13,6 +16,7 @@ android {
             testCoverageEnabled true
         }
         release {
+
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
@@ -27,10 +31,115 @@ android {
                 it.buildConfigField 'String', 'API_ACCOUNT', API_ACCOUNT
                 it.buildConfigField 'String', 'API_PASSWORD', API_PASSWORD
             }
+
+        }
+    }
+}
+ext {
+
+    bintrayRepo = 'maven'
+    bintrayName = 'android-fm'
+
+    publishedGroupId = 'com.joselopezrosario'
+    libraryName = 'android-fm'
+    artifact = 'android-fm'
+
+    libraryDescription = ''
+
+    siteUrl = 'https://github.com/joselopezrosario/filemaker-data-api'
+    gitUrl = 'https://github.com/joselopezrosario/filemaker-data-api.git'
+
+    libraryVersion = '0.0.1'
+
+    developerId = 'joselopezrosario'
+    developerName = 'Jose Lopez'
+    developerEmail = 'joselopezrosario@gmail.com'
+
+    licenseName = 'GNU General Public License v3.0'
+    licenseUrl = 'https://github.com/joselopezrosario/filemaker-data-api/blob/master/LICENSE'
+    allLicenses = ["GPL-3.0"]
+}
+group = publishedGroupId
+version = libraryVersion
+
+install {
+    repositories.mavenInstaller {
+        pom.project {
+            packaging 'aar'
+            groupId publishedGroupId
+            artifactId artifact
+
+            name libraryName
+            description libraryDescription
+            url siteUrl
+
+            licenses {
+                license {
+                    name licenseName
+                    url licenseUrl
+                }
+            }
+            developers {
+                developer {
+                    id developerId
+                    name developerName
+                    email developerEmail
+                }
+            }
+            scm {
+                connection gitUrl
+                developerConnection gitUrl
+                url siteUrl
+            }
         }
     }
 }
 
+task sourcesJar(type: Jar) {
+    classifier = 'sources'
+    from android.sourceSets.main.java.srcDirs
+}
+
+task javadoc(type: Javadoc) {
+    source = android.sourceSets.main.java.srcDirs
+    classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
+}
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    classifier = 'javadoc'
+    from javadoc.destinationDir
+}
+
+artifacts {
+    archives javadocJar
+    archives sourcesJar
+}
+
+Properties properties = new Properties()
+properties.load(project.rootProject.file('local.properties').newDataInputStream())
+
+bintray {
+
+    user = properties.getProperty("bintray.user")
+    key = properties.getProperty("bintray.apikey")
+
+    bintray.configurations = ['archives']
+    pkg {
+        repo = bintrayRepo
+        name = bintrayName
+        desc = libraryDescription
+        websiteUrl = siteUrl
+        vcsUrl = gitUrl
+        licenses = allLicenses
+        dryRun = false
+        publish = true
+        override = true
+        publicDownloadNumbers = true
+        version {
+            desc = libraryDescription
+        }
+    }
+}
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation 'com.android.support:appcompat-v7:28.0.0'

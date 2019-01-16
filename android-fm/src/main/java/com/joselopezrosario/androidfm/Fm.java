@@ -29,7 +29,9 @@ import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
 public final class Fm {
-
+    private static final String GET = "GET";
+    private static final String BASIC = "Basic";
+    private static final String BEARER = "Bearer";
     public static FmResponse execute(FmRequest fmRequest) {
         return processExecute(fmRequest);
     }
@@ -133,7 +135,7 @@ public final class Fm {
             e.printStackTrace();
             return null;
         }
-        if (method.equals(FmRequest.GET)) {
+        if (method.equals(GET)) {
             return urlConnection;
         }
         urlConnection.setDoOutput(true);
@@ -155,10 +157,10 @@ public final class Fm {
      */
     private static String getAuthString(FmRequest request) {
         switch (request.getAuth()) {
-            case FmRequest.BASIC:
-                return FmRequest.BASIC + " " + encodeFileMakerCredentials(request.getAccountName(), request.getPassword());
-            case FmRequest.BEARER:
-                return FmRequest.BEARER + " " + request.getToken();
+            case BASIC:
+                return BASIC + " " + encodeFileMakerCredentials(request.getAccountName(), request.getPassword());
+            case BEARER:
+                return BEARER + " " + request.getToken();
             default:
                 return null;
         }

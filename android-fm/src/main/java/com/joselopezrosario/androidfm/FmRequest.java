@@ -8,12 +8,12 @@ import android.support.annotation.Nullable;
 import java.util.ArrayList;
 
 public class FmRequest {
-    public static final String EMPTY_BODY = "{}";
-    public static final String POST = "POST";
-    public static final String DELETE = "DELETE";
-    public static final String GET = "GET";
-    public static final String BASIC = "Basic";
-    public static final String BEARER = "Bearer";
+    private static final String EMPTY_BODY = "{}";
+    private static final String POST = "POST";
+    private static final String DELETE = "DELETE";
+    private final String GET = "GET";
+    private final String BASIC = "Basic";
+    private final String BEARER = "Bearer";
     private static final String LOGIN = "LOGIN";
     private static final String LOGOUT = "LOGOUT";
     private static final String GETRECORDS = "GETRECORDS";

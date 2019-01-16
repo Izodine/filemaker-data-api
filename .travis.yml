@@ -12,7 +12,7 @@ before_install:
 - chmod +x gradlew
 - yes | sdkmanager "platforms;android-28"
 script:
-  - ./gradlew clean testDebugUnitTest
+  - ./gradlew clean testDebugUnitTest assembleRelease bintrayUpload
 env:
   global:
   - secure: bQkylK/X5noTXKyHV6oXQ2N+Cl7gSsW+pEfsJIvoOVb+Zsj9VbySH1VTBPfY7oaKS4hlT27ZFcv0TNo7fBrEC8HdiIbUlTjR5Yl+A8+DrQ+QdyJoSVEqbf5Ob5hUC9kPTb57iyoJUkOB7M5/9xuOKlpP/ZCw3dAdXmFrDv4Gop2SheZakoF58myjvKD5Pbfp7Nevxd3Dj1QIZSH9fNegEhOz6AU4tQqSs0LiQXAhFEjXWx2hgFRVYxhOru3eGwdqYOQhe/ML9zYS19cHtwt7UCwqXVA8v+uYIbTNbY8/nEOKzklBZfkdEb2/SxTD4mBz1iq87ujWHW9hGoSMBg3v51ikfMM6eTbGyr5Mes5kGkOrBaSbXDKA1n96kgy2ZbZMsSYOLtAbgSCs8PWhMPbQTo8YQTWgEb0Mfr4CII5N8mZGxA1xmKTEjTv6J6ucJ2v41Hu2quI226yZO5lU97CLIqkUc2SKMjQNBGjkAiklfi1rH3rRK7YcF0hOQUb21908FJyvlqhO+ros5jdRNUTSABJ0on+zF6hK4OvzQiBptJmqy5VA1UQjfRt0BhN385Ll/ytcNdISn/IfywNYxVOTYFcskU40u/fR53LOIPHoIYCbPA86j1pHPliHdtAhemcyrF5uYjnMWdYxE2dN0TWcd6CYu/+OYpkWIuHano2f/Vk=
