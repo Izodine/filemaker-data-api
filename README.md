@@ -49,7 +49,7 @@ Use this class to create a request object that contains:
 * The information required by the API - like the url, credentials, and body
 * Other optional information created through support classes - like the sort, portal, and script parameters
 
-#### login(url, account, password)
+### login(url, account, password)
 ***To log in to FileMaker and receive a token***
 
 To use the FileMaker Data API, you must log in with an account that has the fmrest extended privilege enabled so you can receive a session token. All subsequent calls will require this token.
