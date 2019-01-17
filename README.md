@@ -202,6 +202,21 @@ The `FmResponse` class is used to retrieve the results from the FileMaker Server
 ```java
     FmResponse response = Fm.execute(request);
 ```
+
+## getHttpCode()
+
+To get the server's http response code.
+
+**Usage**:
+
+```java
+    FmRequest request = new FmRequest()
+            .login("url", "jose", "syaP.F;9'b+F#q#Y")
+            .build();
+    FmResponse response = Fm.execute(request);
+    if (response.getHttpCode()) {
+        // Success
+    }
 ___
 
 # Optional Support Classes

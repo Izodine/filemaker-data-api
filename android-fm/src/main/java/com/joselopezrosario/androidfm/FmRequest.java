@@ -49,7 +49,7 @@ public class FmRequest {
         this.setPassword(null);
         this.disableSSL(false);
     }
-
+    // TODO: Decide if the final URL will be created here or in the build method
     /**
      * login
      *
@@ -226,11 +226,13 @@ public class FmRequest {
      * @return an FmRequest object
      */
     public FmRequest build() {
+        // Common validation. All methods need this.
         if (this.getEndpoint() == null || this.getEndpoint().isEmpty()) {
             this.setOk(false);
             this.setMessage("Invalid endpoint: " + this.getEndpoint());
             return this;
         }
+        // TODO: Improve the validation. Perhaps create a validate method with groups to remove duplicate code
         switch (fmMethod) {
             case LOGIN:
                 if (this.getAccountName() == null || this.getAccountName().isEmpty()) {
@@ -286,10 +288,25 @@ public class FmRequest {
                             this.limit, this.offset, this.fmSort, this.fmPortal, this.fmScript, null);
                 }
             case FINDRECORDS:
-                this.setOk(true);
-                this.setEndpoint(endpoint + "/layouts/" + layout + "/_find");
-                return buildParameters(this.endpoint, this.layout, this.fmFind,
-                        this.limit, this.offset, this.fmSort, this.fmPortal, this.fmScript, null);
+                if (this.getToken() == null || this.getToken().isEmpty()) {
+                    this.setOk(false);
+                    this.setMessage("Invalid token: " + this.getToken());
+                    return this;
+                } else if (this.fmFind == null) {
+                    this.setOk(false);
+                    this.setMessage("No find criteria specified");
+                    return this;
+                } else if (this.getLayout() == null || this.getLayout().isEmpty()) {
+                    this.setOk(false);
+                    this.setMessage("Invalid layout: " + this.getLayout());
+                    return this;
+                } else {
+                    this.setOk(true);
+                    this.setEndpoint(endpoint + "/layouts/" + layout + "/_find");
+                    return buildParameters(this.endpoint, this.layout, this.fmFind,
+                            this.limit, this.offset, this.fmSort, this.fmPortal, this.fmScript, null);
+                }
+
             case CREATE:
                 this.setOk(true);
                 return buildParameters(this.endpoint, this.layout, this.fmFind,
@@ -301,9 +318,12 @@ public class FmRequest {
             default:
                 return null;
         }
+
     }
 
     /**
+     * buildParameters
+     * A method to create the final parameters. Either in URL or JSON body format
      * @param endpoint the FileMaker Data API endpoint (ex: https://host/fmi/data/v1/databases/MyDatabase)
      * @param layout   the layout from where to retrieve the records
      * @param limit    the maximum number of records that should be returned
@@ -337,7 +357,7 @@ public class FmRequest {
         ------------------------------------------------------------------------------------------*/
         if (limit != null) {
             String limitParams = getLimitString(limit, type);
-            if (!limitParams.equals("")) {
+            if (!limitParams.isEmpty()) {
                 paramsArray.add(limitParams);
             }
         }
@@ -346,7 +366,7 @@ public class FmRequest {
         ------------------------------------------------------------------------------------------*/
         if (offset != null) {
             String offsetParams = getOffsetString(offset, type);
-            if (!offsetParams.equals("")) {
+            if (!offsetParams.isEmpty()) {
                 paramsArray.add(offsetParams);
             }
         }
@@ -355,7 +375,7 @@ public class FmRequest {
         ------------------------------------------------------------------------------------------*/
         if (fmSort != null) {
             String sortParams = getSortString(fmSort, type);
-            if (!sortParams.equals("")) {
+            if (!sortParams.isEmpty()) {
                 paramsArray.add(sortParams);
             }
         }
@@ -364,7 +384,7 @@ public class FmRequest {
         ------------------------------------------------------------------------------------------*/
         if (fmPortal != null) {
             String portalParams = getPortalString(fmPortal, type);
-            if (!portalParams.equals("")) {
+            if (!portalParams.isEmpty()) {
                 paramsArray.add(portalParams);
             }
         }
@@ -373,7 +393,7 @@ public class FmRequest {
         ------------------------------------------------------------------------------------------*/
         if (fmScript != null) {
             String scriptParams = getScriptString(fmScript, type);
-            if (!scriptParams.equals("")) {
+            if (!scriptParams.isEmpty()) {
                 paramsArray.add(scriptParams);
             }
         }
@@ -381,18 +401,18 @@ public class FmRequest {
         Build the query parameters
         ------------------------------------------------------------------------------------------*/
         String queryParams = getQueryString(fmFind);
-        if (!queryParams.equals("")) {
+        if (!queryParams.isEmpty()) {
             paramsArray.add(queryParams);
         }
         /*------------------------------------------------------------------------------------------
         Build the edit parameters
         ------------------------------------------------------------------------------------------*/
         String editParams = getEditString(fmEdit);
-        if (!editParams.equals("")) {
+        if (!editParams.isEmpty()) {
             paramsArray.add(editParams);
         }
         /*------------------------------------------------------------------------------------------
-        Build the final parameters string
+        Build the final parameters string and append to url or set to body accordingly
         ------------------------------------------------------------------------------------------*/
         if (this.fmMethod.equals(GETRECORDS)) {
             params = "?" + android.text.TextUtils.join("&", paramsArray);
