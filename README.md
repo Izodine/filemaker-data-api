@@ -66,7 +66,7 @@ To use the FileMaker Data API, you must log in with an account that has the fmre
     String token = response.getToken();
 ```
 
-#### logout(url, token)
+### logout(url, token)
 
 ***To logout from the FileMaker session and release the connection***
    
@@ -130,7 +130,7 @@ Then pass the FmFind object to the FmRequest.findRecords() method.
         .findRecords(url, token, "vgsales", fmFind)
         .build();
 ```
-#### create(url, token, layout)
+### create(url, token, layout)
 ***To create a blank record.***
 
 **Usage**:
@@ -139,7 +139,7 @@ Then pass the FmFind object to the FmRequest.findRecords() method.
     .create(url, token, "vgsales")
     .build();
  ```
-#### create(url, token, layout, fmEdit)
+### create(url, token, layout, fmEdit)
 ***To create a record with values***
 
 To set the initial values use the FmEdit class. Set the name of the field and its value through the `set()` method.
