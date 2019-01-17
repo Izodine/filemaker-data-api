@@ -1,6 +1,5 @@
 package com.joselopezrosario.androidfm;
 
-
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -108,7 +107,6 @@ public class FmRequest {
         this.setToken(token);
         this.setLayout(layout);
         this.setMethod(GET);
-        this.setBody(EMPTY_BODY);
         this.setAuth(BEARER);
         return this;
     }
@@ -131,11 +129,9 @@ public class FmRequest {
         this.setToken(token);
         this.setLayout(layout);
         this.setMethod(GET);
-        this.setBody(EMPTY_BODY);
         this.setAuth(BEARER);
         return this;
     }
-
 
     /**
      * FindRecords
@@ -160,12 +156,22 @@ public class FmRequest {
         return this;
     }
 
+    /**
+     * create
+     * Create a record with values
+     *
+     * @param url    the FileMaker Data API url (ex: https://host/fmi/data/v1/databases/MyDatabase)
+     * @param token  the token returned in the response by executing the login request
+     * @param layout the layout from where to create the record
+     * @param fmEdit an FmEdit object containing Value field name value pair objects
+     * @return an FmRequest object
+     */
     public FmRequest create(@NonNull String url,
                             @NonNull String token,
                             @NonNull String layout,
                             @NonNull FmEdit fmEdit) {
         this.setFmMethod(CREATE);
-        this.setEndpoint(url);
+        this.setEndpoint(url + "/layouts/" + layout + "/records");
         this.setToken(token);
         this.setLayout(layout);
         this.setMethod(POST);
@@ -174,6 +180,15 @@ public class FmRequest {
         return this;
     }
 
+    /**
+     * create
+     * Create a blank record
+     *
+     * @param url    the FileMaker Data API url (ex: https://host/fmi/data/v1/databases/MyDatabase)
+     * @param token  the token returned in the response by executing the login request
+     * @param layout the layout from where to create the record
+     * @return an FmRequest object
+     */
     public FmRequest create(@NonNull String url,
                             @NonNull String token,
                             @NonNull String layout) {
@@ -182,10 +197,25 @@ public class FmRequest {
         this.setToken(token);
         this.setLayout(layout);
         this.setMethod(POST);
+        this.setEditParams(new FmEdit());
         this.setAuth(BEARER);
         return this;
     }
 
+    public FmRequest delete(@NonNull String url,
+                            @NonNull String token,
+                            @NonNull String layout,
+                            @NonNull int recordId) {
+        this.setFmMethod(DELETE);
+        this.setRecordId(recordId);
+        this.setEndpoint(url);
+        this.setToken(token);
+        this.setLayout(layout);
+        this.setMethod(DELETE);
+        this.setAuth(BEARER);
+        return this;
+
+    }
 
     /**
      * build
@@ -262,9 +292,12 @@ public class FmRequest {
                         this.limit, this.offset, this.fmSort, this.fmPortal, this.fmScript, null);
             case CREATE:
                 this.setOk(true);
-                this.setEndpoint(endpoint + "/layouts/" + layout + "/records");
                 return buildParameters(this.endpoint, this.layout, this.fmFind,
                         this.limit, this.offset, this.fmSort, this.fmPortal, this.fmScript, this.fmEdit);
+            case DELETE:
+                this.setOk(true);
+                return buildParameters(this.endpoint, this.layout, null,
+                        null, null, null, null, this.fmScript, null);
             default:
                 return null;
         }
@@ -364,6 +397,9 @@ public class FmRequest {
         if (this.fmMethod.equals(GETRECORDS)) {
             params = "?" + android.text.TextUtils.join("&", paramsArray);
             this.setEndpoint(endpoint + "/layouts/" + layout + "/records" + params);
+        } else if (this.fmMethod.equals(DELETE)) {
+            params = "?" + android.text.TextUtils.join("&", paramsArray);
+            this.setEndpoint(endpoint + "/layouts/" + layout + "/records/" + this.recordId + params);
         } else {
             params = "{" + android.text.TextUtils.join(",", paramsArray) + "}";
             this.setBody(params);

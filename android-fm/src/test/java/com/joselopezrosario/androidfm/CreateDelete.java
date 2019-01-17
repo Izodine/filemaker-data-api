@@ -36,14 +36,44 @@ public class CreateDelete {
     }
 
     @Test
-    public void createBlankRecord(){
+    public void createBlankRecordAndDeleteIt(){
         System.out.println("-----------------------");
-        System.out.println("createBlankRecord");
+        System.out.println("createBlankRecordAndDeleteIt");
         System.out.println("-----------------------");
         FmRequest request = new FmRequest()
                 .create(ENDPOINT, token, LAYOUT_VGSALES)
                 .build();
         FmResponse response = Fm.execute(request);
+        assert response.isOk();
+        int recordId = response.getRecordId();
+        request = new FmRequest()
+                .delete(ENDPOINT, token, LAYOUT_VGSALES, recordId)
+                .build();
+        response = Fm.execute(request);
+        assert response.isOk();
+    }
+
+    @Test
+    public void createBlankRecordAndDeleteItWithScripts(){
+        System.out.println("-----------------------");
+        System.out.println("createBlankRecordAndDeleteItWithScripts");
+        System.out.println("-----------------------");
+        FmRequest request = new FmRequest()
+                .create(ENDPOINT, token, LAYOUT_VGSALES)
+                .build();
+        FmResponse response = Fm.execute(request);
+        if ( !response.isOk()){
+            assert false;
+            return;
+        }
+        int recordId = response.getRecordId();
+        FmScript script = new FmScript()
+                .setScript("log").setScriptParam("Delete record " + recordId);
+        request = new FmRequest()
+                .delete(ENDPOINT, token, LAYOUT_VGSALES, recordId)
+                .setScriptPrams(script)
+                .build();
+        response = Fm.execute(request);
         assert response.isOk();
     }
 

@@ -54,7 +54,7 @@ Use this class to create a request object that contains:
 
 To use the FileMaker Data API, you must log in with an account that has the fmrest extended privilege enabled so you can receive a session token. All subsequent calls will require this token.
 
-**Usage:**
+**Usage**:
 ```java
     // Create a request object, call the login method, and build it
     FmRequest request = new FmRequest()
@@ -70,7 +70,7 @@ To use the FileMaker Data API, you must log in with an account that has the fmre
 
 ***To logout from the FileMaker session and release the connection***
    
-**Usage:**
+**Usage**:
 ```java
     FmRequest request = new FmRequest()
         .logout(url, token)
@@ -82,7 +82,7 @@ To use the FileMaker Data API, you must log in with an account that has the fmre
 
 For example, to get 20 records starting from the 10th record.
 
-**Usage:**
+**Usage**:
 ```java
     FmRequest request = new FmRequest()
         .getRecords(url, token, "vgsales")
@@ -116,7 +116,7 @@ You can chain the methods to create multiple find requests at once.
 
 This example shows how to to find all the games published by Nintendo in 1985, and all games published by Sega between 1991 and 1996, but it omits the games puiblished by Sega in 1994.
 
-**Usage:**
+**Usage**:
 
 ```java
     FmFind fmFind = new FmFind()
@@ -135,9 +135,9 @@ Then pass the FmFind object to the FmRequest.findRecords() method.
 
 **Usage**:
 ```java
- FmRequest request = new FmRequest()
-    .create(url, token, "vgsales")
-    .build();
+    FmRequest request = new FmRequest()
+        .create(url, token, "vgsales")
+        .build();
  ```
 ### create(url, token, layout, fmEdit)
 ***To create a record with values***
@@ -146,18 +146,64 @@ To set the initial values use the FmEdit class. Set the name of the field and it
 
 **Usage**:
 ```java
- FmEdit edit = new FmEdit();
-    .set("Rank", "999732")
-    .set("Name", "Jose's game")
-    .set("Publisher", "Lorem ipsum")
-    .set("Genre", "Arcade")
-    .set("Platform", "Nes")
-    .set("Year", "1981");
- FmRequest request = new FmRequest()
-    .create(url, token, "vgsales", fmEdit)
-    .build();
+    FmEdit edit = new FmEdit();
+        .set("Rank", "999732")
+        .set("Name", "Jose's game")
+        .set("Publisher", "Lorem ipsum")
+        .set("Genre", "Arcade")
+        .set("Platform", "Nes")
+        .set("Year", "1981");
+    FmRequest request = new FmRequest()
+        .create(url, token, "vgsales", fmEdit)
+        .build();
  ```
----
+
+ ### delete(url, token, layout, recordId)
+ ***To delete a record***
+
+To delete a record, call the `delete()` method and pass the record's id.
+
+**Usage**:
+
+```java
+    FmRequest request = new FmRequest()
+        .delete(url, token, "vgsales", 245)
+        .build();
+```
+
+Optionally, you can pass an FmScript object through the setScriptParams() method.
+
+For example:
+
+```java
+    int recordId = 1300;
+    FmScript script = new FmScript()
+        .setScript("log").setScriptParam("Deleted record #" + recordId);
+    FmRequest request = new FmRequest()
+        .delete(url, token, "vgsales", recordId)
+        .setScriptPrams(script)
+        .build();
+```
+___
+
+## Fm
+The `Fm` class provides a static method called `execute()` to run a request. 
+
+**Usage**:
+
+```java
+    Fm.execute(request);
+```    
+___
+## FmResponse
+The `FmResponse` class is used to retrieve the results from the FileMaker Server Data API.
+
+**Usage**:
+```java
+    FmResponse response = Fm.execute(request);
+```
+___
+
 # Optional Support Classes
 Use these classes to build the optional request parameters.
 ## FmPortal
@@ -169,8 +215,8 @@ Create an FmPortal object and call the `setName()`, `setLimit()` and `setOffset(
 For example:
 ```java
     FmPortal fmPortal = new FmPortal()
-        .setName(LAYOUT_VGSALES).setLimit(3).setOffset(1)
-        .setName(LAYOUT_PUBLISHERS).setLimit(3).setOffset(1);
+        .setName("vgsales").setLimit(3).setOffset(1)
+        .setName("publishers").setLimit(3).setOffset(1);
 ```
 Then pass the FmPortal object to your FmRequest through the `setPortalParams()` method.
 ```java

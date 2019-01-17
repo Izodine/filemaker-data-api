@@ -30,6 +30,7 @@ import javax.net.ssl.X509TrustManager;
 
 public final class Fm {
     private static final String GET = "GET";
+    private static final String DELETE = "DELETE";
     private static final String BASIC = "Basic";
     private static final String BEARER = "Bearer";
     public static FmResponse execute(FmRequest fmRequest) {
@@ -135,7 +136,7 @@ public final class Fm {
             e.printStackTrace();
             return null;
         }
-        if (method.equals(GET)) {
+        if (body == null) {
             return urlConnection;
         }
         urlConnection.setDoOutput(true);
