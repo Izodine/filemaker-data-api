@@ -43,7 +43,7 @@ public class FindRecords {
     @Test
     public void findRecords() {
         System.out.println("-----------------------");
-        System.out.println("findRecords");
+        System.out.println("Find Records");
         System.out.println("-----------------------");
         FmFind findGames = new FmFind()
                 .newRequest().set("Publisher", "Nintendo").set("Year", "1985")
@@ -53,7 +53,7 @@ public class FindRecords {
                 .findRecords(ENDPOINT, token, LAYOUT_VGSALES, findGames)
                 .build();
         FmResponse response = Fm.execute(request);
-        FmData fmData = new FmData().create(response);
+        FmData fmData = new FmData(response);
         int foundcount = fmData.size();
         System.out.println("Foundcount: " + foundcount);
         assert findGames.countQueries() == 6 && fmData.size() > 0;
@@ -67,7 +67,7 @@ public class FindRecords {
     @Test
     public void findRecordWithPortalData() {
         System.out.println("-----------------------");
-        System.out.println("findRecordWithPortalData");
+        System.out.println("Find records with portal data");
         System.out.println("-----------------------");
         FmFind findGames = new FmFind();
         findGames.newRequest().set("Genre", "Platform");
@@ -90,7 +90,7 @@ public class FindRecords {
             assert false;
             return;
         }
-        FmData fmData = new FmData().create(response);
+        FmData fmData = new FmData(response);
         int foundcount = fmData.size();
         System.out.println("Foundcount: " + foundcount);
         int randomNumber = ThreadLocalRandom.current().nextInt(0, foundcount - 1);

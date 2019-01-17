@@ -50,7 +50,7 @@ Use this class to create a request object that contains:
 * Other optional information created through support classes - like the sort, portal, and script parameters
 
 ### login(url, account, password)
-***To log in to FileMaker and receive a token***
+To log in to FileMaker and receive a token
 
 To use the FileMaker Data API, you must log in with an account that has the fmrest extended privilege enabled so you can receive a session token. All subsequent calls will require this token.
 
@@ -68,7 +68,7 @@ To use the FileMaker Data API, you must log in with an account that has the fmre
 
 ### logout(url, token)
 
-***To logout from the FileMaker session and release the connection***
+To logout from the FileMaker session and release the connection
    
 **Usage**:
 ```java
@@ -78,7 +78,7 @@ To use the FileMaker Data API, you must log in with an account that has the fmre
 ```
 ### getRecords(url, token, layout)
 
-***To get a foundset of records***
+To get a foundset of records
 
 For example, to get 20 records starting from the 10th record.
 
@@ -93,7 +93,7 @@ For example, to get 20 records starting from the 10th record.
 
 
 ### getRecord(url, token, layout, recordId)
-***To get a specific record by its id***
+To get a specific record by its id
 
 For example, to get record id 100.
 ```java
@@ -104,7 +104,7 @@ For example, to get record id 100.
 
 
 ### findRecords(url, token, layout, fmFind)
-***To find records by one or multiple criteria***
+To find records by one or multiple criteria
 
 Use the FmFind class to easily build complex queries. FmFind has the following methods that you must call in order.
 
@@ -131,7 +131,7 @@ Then pass the FmFind object to the FmRequest.findRecords() method.
         .build();
 ```
 ### create(url, token, layout)
-***To create a blank record.***
+To create a blank record
 
 **Usage**:
 ```java
@@ -140,7 +140,7 @@ Then pass the FmFind object to the FmRequest.findRecords() method.
         .build();
  ```
 ### create(url, token, layout, fmEdit)
-***To create a record with values***
+To create a record with values
 
 To set the initial values use the FmEdit class. Set the name of the field and its value through the `set()` method.
 
@@ -159,7 +159,7 @@ To set the initial values use the FmEdit class. Set the name of the field and it
  ```
 
  ### delete(url, token, layout, recordId)
- ***To delete a record***
+ To delete a record
 
 To delete a record, call the `delete()` method and pass the record's id.
 
@@ -194,6 +194,7 @@ The `Fm` class provides a static method called `execute()` to run a request.
 ```java
     Fm.execute(request);
 ```    
+The `execute()` method returns and `FmResponse` object.
 ___
 ## FmResponse
 The `FmResponse` class is used to retrieve the results from the FileMaker Server Data API.
@@ -203,7 +204,7 @@ The `FmResponse` class is used to retrieve the results from the FileMaker Server
     FmResponse response = Fm.execute(request);
 ```
 
-## getHttpCode()
+### getHttpCode()
 
 To get the server's http response code.
 
@@ -214,12 +215,190 @@ To get the server's http response code.
             .login("url", "jose", "syaP.F;9'b+F#q#Y")
             .build();
     FmResponse response = Fm.execute(request);
-    if (response.getHttpCode()) {
+    if (response.getHttpCode() == 200) {
         // Success
     }
+```
+
+### getFmCode() and getFmMessage()
+
+To get the error code and error message returned by the FileMaker Data API.
+
+**Usage**:
+
+```java
+    // Execute the request and get a response
+    FmResponse response = Fm.execute(request);
+    // Get the message from FileMaker, for example "Ok"
+    String fmMessage = response.getFmMessage();
+    // Get the message code from FileMaker, for example 0
+    int fmCode = response.getFmMessageCode();
+```
+
+### isOk()
+
+To simply return `true` if the request was successful.
+
+**Usage**:
+
+```java
+    FmResponse response = Fm.execute(request);
+    response.isOk(){
+        // success!
+    }
+```
+
+### getToken()
+
+To get the authorization token after executing the `login()` request.
+
+**Usage**:
+
+```java
+    String token = response.getToken();
+```
+
+### getRecordId() and getModId()
+
+To get the record's id and mod id. 
+
+The table below shows when to use these methods.
+
+| Request       |  getRecordId()| getModId()| 
+|---            |---            |---        |
+| create()      | Yes           | Yes       |
+| edit()        | No            | Yes       | 
+| getRecord()   | Yes           | Yes       | 
+
+### The script response methods
+
+To get the script error and script result from the response.
+
+**On pre-request**
+* `getPreRequestScriptError()`
+* `getPreRequestScriptResult()`
+
+**On pre-sort**
+* `getPreSortScriptError()`
+* `getPreSortScriptResult()`
+
+**After request and sort**
+* `getScriptError()`
+* `getScriptResult()`
+
+**Usage**:
+
+```java
+    int preRequestError = response.getPreRequestScriptError();
+    String preRequestResult = response.getPreRequestScriptResult();
+    
+    int preSortError = response.getPreSortScriptError();
+    String preSortResult = response.getPreSortScriptResult();
+    
+    int scriptError = response.getScriptError();
+    String scriptResult = response.getScriptResult();
+```
 ___
 
-# Optional Support Classes
+# FmData
+
+A class to handle the records that come through a response.
+
+First, create an `FmData` object while passing an `FmResponse`.
+
+**Usage**:
+
+```java
+    FmData data = new FmData(response);
+```
+
+### size()
+
+To get the number of records in the data object.
+
+**Usage**:
+
+```java
+    int size = data.size();
+```
+
+### getRecord(index)
+
+To get the specified record pass the record's index position. This method returns an FmRecord object which you will see in the next section.
+
+**Usage**:
+
+```java
+    FmRecord record = fmData.getRecord(200);
+```
+___
+# FmRecord
+A class to facilitate parsing an individual record.
+
+First, create an `FmRecord` object while passing the results of `FmData.getRecord()`.
+
+**Usage**:
+
+To create a new object.
+```java
+    FmRecord record = data.getRecord(100);
+```
+
+To loop through all the records.
+
+```java
+    FmData fmData = new FmData(response);
+    int size = fmData.size();
+    int i = 0;
+    while ( i < size ){
+        FmRecord record = fmData.getRecord(i);
+        // Do something with each record
+        i ++;
+    }       
+```
+
+## getRecordId() & getModId()
+
+To get the record's id and mod it.
+
+**Usage**:
+```java
+    int recId = record.getRecordId();
+    int modId = record.getModId();
+```
+
+## getValue(fieldName)
+
+To get a record's field value. The values are always returned as String.
+
+**Usage**:
+```java
+    String rank = record.getValue("Rank");
+    String name = record.getValue("Name");
+    String platform = record.getValue("Platform");
+    String publisher = record.getValue("Publisher");
+    String genre = record.getValue("Genre");
+    String year = record.getValue("Year");
+```
+
+## getPortalSize()
+
+To get the number of related portal records.
+
+```java
+    int size = record.getPortalSize();
+```
+
+## getPortalRecord(portalName, index)
+
+To create a new record out of a related portal record.
+
+```java
+    FmRecord portalRecord = record.getPortalRecord("vgsales", 100);
+```
+___
+# Optional & Support Classes
+
 Use these classes to build the optional request parameters.
 ## FmPortal
 ***To get related records***
@@ -267,19 +446,24 @@ Then, pass it to the FmRequest object through the `sortParams()` method.
 ***To call scripts***
 The FileMaker Data API has three options for running scripts:
 
-1. **script**: runs after the action and sort are executed
-2. **script pre-request**: runs before the action and sort are executed
-3. **script pre-sort**: runs after executing the request but before sorting the records
+1. **script pre-request**: runs before the action and sort are executed
+2. **script pre-sort**: runs after executing the request but before sorting the records
+3. **script**: runs after the action and sort are executed
 
 You can set these options through an FmScript object. Create the object using this constructor `FmScript()`.  Then set the options using the following methods:
 
-* `setScript()` - sets the script name
-* `setScriptParam()` - sets the script parameter
-* `setPreRequest()` - sets the pre-request script name
-* `setPreRequestParam()` - sets the pre-request script paramter
-* `setPreSort()` - sets the pre-sort script name
-* `setPreSortParam()` - sets the pre-sort script paramter
-* `setLayoutResponse()` - the layout to switch to when processing the response
+**Pre-request**
+* `setPreRequest()` sets the pre-request script name
+* `setPreRequestParam()` sets the pre-request script paramter
+
+**Pre-sort**
+* `setPreSort()` sets the pre-sort script name
+* `setPreSortParam()` sets the pre-sort script paramter
+
+**After request and sort**
+* `setScript()` sets the script name
+* `setScriptParam()` sets the script parameter
+* `setLayoutResponse()` the layout to switch to when processing the response
 
 For example, the VideoGameSales FileMaker databases has a script named log that goes to the log layout, creates a new record, and sets the Message field with the value of the script parameter. We can create an FmScript object to run the `log` script using the three options.
 
@@ -304,7 +488,21 @@ CreationTimestamp	    Message
 01/11/2019 13:44:29	    Hello from pre-sort-script
 01/11/2019 13:44:29	    Hello from script
 ```
----
+
+The table below shows which requests support the `setScriptParam()` method.
+
+| Request       |  Supports Scripts | 
+|---            |---                |
+| create()      | No                | 
+| delete()      | Yes               | 
+| edit()        | Yes               | 
+| getRecord()   | Yes               | 
+| getRecords()  | Yes               | 
+| upload()      | No                | 
+| findRecords() | Yes               | 
+
+___
+
 # Testing
 
 To run the unit tests, modify the the gradle.properties file to include your own values:
@@ -315,7 +513,7 @@ API_ACCOUNT="APIUser"
 API_PASSWORD="syaP.F;9'b+F#q#Y"
 ```
 
-If using [TravisCI](https://travis-ci.org/), also modify the travis.yml file to include your environment variables:
+If you are using [TravisCI](https://travis-ci.org/), also modify the travis.yml file to include your environment variables:
 
 ```yml
 env:

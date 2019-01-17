@@ -38,7 +38,7 @@ public class CreateDelete {
     @Test
     public void createBlankRecordAndDeleteIt(){
         System.out.println("-----------------------");
-        System.out.println("createBlankRecordAndDeleteIt");
+        System.out.println("Create blank record and delete it");
         System.out.println("-----------------------");
         FmRequest request = new FmRequest()
                 .create(ENDPOINT, token, LAYOUT_VGSALES)
@@ -56,7 +56,7 @@ public class CreateDelete {
     @Test
     public void createBlankRecordAndDeleteItWithScripts(){
         System.out.println("-----------------------");
-        System.out.println("createBlankRecordAndDeleteItWithScripts");
+        System.out.println("Create blank record, delete it, and run script");
         System.out.println("-----------------------");
         FmRequest request = new FmRequest()
                 .create(ENDPOINT, token, LAYOUT_VGSALES)
@@ -83,7 +83,7 @@ public class CreateDelete {
     @Test
     public void createRecordAndSetValues() {
         System.out.println("-----------------------");
-        System.out.println("createRecordAndSetValues");
+        System.out.println("Create a record and set values");
         System.out.println("-----------------------");
         FmEdit edit = new FmEdit()
                 .set("Rank", "999732")
@@ -101,7 +101,7 @@ public class CreateDelete {
                 .getRecord(ENDPOINT, token, LAYOUT_VGSALES, recordId)
                 .build();
         response = Fm.execute(request);
-        FmData fmData = new FmData().create(response);
+        FmData fmData = new FmData(response);
         TestUtils.parseVgSales(fmData.getRecord(0));
         assert response.isOk();
 

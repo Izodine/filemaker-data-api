@@ -41,6 +41,10 @@ public class FmResponse {
         return httpCode;
     }
 
+    /**
+     * isOk
+     * @return true of the FileMaker response message code = 0
+     */
     public Boolean isOk() {
         return getFmMessageCode() == 0;
     }
@@ -70,19 +74,19 @@ public class FmResponse {
         return ScriptResult;
     }
 
-    public int getScriptErrorPreRequest() {
+    public int getPreRequestScriptError() {
         return ScriptErrorPreRequest;
     }
 
-    public String getScriptResultPreRequest() {
+    public String getPreRequestScriptResult() {
         return ScriptResultPreRequest;
     }
 
-    public int getScriptErrorPreSort() {
+    public int getPreSortScriptError() {
         return ScriptErrorPreSort;
     }
 
-    public String getScriptResultPreSort() {
+    public String getPreSortScriptResult() {
         return ScriptResultPreSort;
     }
 

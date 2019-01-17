@@ -4,15 +4,32 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+/**
+ * FmRecord
+ * A class to facilitate parsing records from an FmData object
+ */
 public class FmRecord {
     private JSONObject record;
     private String portalName;
     private boolean isPortalRecord;
 
-    public FmRecord(JSONObject record) {
+    /**
+     * FmRecord
+     * Private constructor used to create the FmRecord object from an FmData's data JSONObject
+     * @param record an FmData's JSONObject
+     */
+    FmRecord(JSONObject record) {
         this.record = record;
     }
 
+    /* ---------------------------------------------------------------------------------------------
+    Public getters
+    ----------------------------------------------------------------------------------------------*/
+    /**
+     * getRecordId
+     * Get the record's internal id
+     * @return the record's id
+     */
     public int getRecordId(){
         try {
             return record.getInt("recordId");
@@ -22,6 +39,11 @@ public class FmRecord {
         }
     }
 
+    /**
+     * getModId
+     * Get the record's internal modification id (or version)
+     * @return the record's mod id
+     */
     public int getModId(){
         try {
             return record.getInt("modId");
@@ -31,6 +53,12 @@ public class FmRecord {
         }
     }
 
+    /**
+     * getPortalRecord
+     * @param portalName the portal's name or related table's name
+     * @param index the position of the record
+     * @return an FmRecord object
+     */
     public FmRecord getPortalRecord (String portalName, int index){
         try {
             JSONObject portalData = this.record.getJSONObject("portalData");
@@ -43,6 +71,11 @@ public class FmRecord {
         }
     }
 
+    /**
+     * getPortalSize
+     * @param portalName
+     * @return
+     */
     public int portalSize (String portalName){
         try {
             JSONArray portalData = this.record.getJSONObject("portalData").getJSONArray(portalName);
@@ -53,6 +86,12 @@ public class FmRecord {
         }
     }
 
+    /**
+     * getValue
+     * Get a record's value
+     * @param fieldName the field name
+     * @return the field value
+     */
     public String getValue(String fieldName){
         if ( !this.isPortalRecord ){
             try{
@@ -69,11 +108,15 @@ public class FmRecord {
         }
         return null;
     }
-
+    /* ---------------------------------------------------------------------------------------------
+     Private getters
+     ----------------------------------------------------------------------------------------------*/
     private String getPortalName() {
         return portalName;
     }
-
+    /* ---------------------------------------------------------------------------------------------
+     Private setters
+     ----------------------------------------------------------------------------------------------*/
     private FmRecord setPortalName(String portalName) {
         this.portalName = portalName;
         return this;

@@ -41,7 +41,7 @@ public class GetRecords {
     @Test
     public void validateToken() {
         System.out.println("-----------------------");
-        System.out.println("validateToken");
+        System.out.println("Validate the token");
         System.out.println("-----------------------");
         System.out.println("Token: " + token);
         assert token != null;
@@ -50,7 +50,7 @@ public class GetRecords {
     @Test
     public void getRecords() {
         System.out.println("-----------------------");
-        System.out.println("getRecords");
+        System.out.println("Get records");
         System.out.println("-----------------------");
         FmRequest request = new FmRequest()
                 .getRecords(ENDPOINT, token, LAYOUT_VGSALES)
@@ -62,7 +62,7 @@ public class GetRecords {
             return;
         }
         FmResponse response = Fm.execute(request);
-        FmData fmData = new FmData().create(response);
+        FmData fmData = new FmData(response);
         int max = fmData.size() - 1;
         System.out.println("Total records: " + max);
         int randomNum = ThreadLocalRandom.current().nextInt(0, max);
@@ -79,7 +79,7 @@ public class GetRecords {
     @Test
     public void getRecord() {
         System.out.println("-----------------------");
-        System.out.println("getRecord");
+        System.out.println("Get record");
         System.out.println("-----------------------");
         FmRequest request = new FmRequest()
                 .getRecords(ENDPOINT, token, LAYOUT_VGSALES)
@@ -91,7 +91,7 @@ public class GetRecords {
             return;
         }
         FmResponse response = Fm.execute(request);
-        FmData fmData = new FmData().create(response);
+        FmData fmData = new FmData(response);
         int max = fmData.size() - 1;
         int randomNum = ThreadLocalRandom.current().nextInt(0, max);
         System.out.println("Total records: " + max);
@@ -108,7 +108,7 @@ public class GetRecords {
             return;
         }
         response = Fm.execute(request);
-        fmData = new FmData().create(response);
+        fmData = new FmData(response);
         record = fmData.getRecord(0);
         assert TestUtils.parseVgSales(record);
 
@@ -117,7 +117,7 @@ public class GetRecords {
     @Test
     public void getRecordPortalData() {
         System.out.println("-----------------------");
-        System.out.println("getRecordPortalData");
+        System.out.println("Get record with portal data");
         System.out.println("-----------------------");
         FmPortal fmPortal = new FmPortal()
                 .setName(LAYOUT_VGSALES).setLimit(3).setOffset(1)
@@ -137,12 +137,12 @@ public class GetRecords {
             assert false;
             return;
         }
-        FmData fmData = new FmData().create(response);
+        FmData fmData = new FmData(response);
         int max = fmData.size() - 1;
         int randomNumber = ThreadLocalRandom.current().nextInt(0, max);
         System.out.println("Record #: " + randomNumber);
         FmRecord record = fmData.getRecord(randomNumber);
-        randomNumber = ThreadLocalRandom.current().nextInt(0, 2);
+        randomNumber = ThreadLocalRandom.current().nextInt(0, record.portalSize(LAYOUT_VGSALES)-1);
         FmRecord portalRecord = record.getPortalRecord(LAYOUT_VGSALES, randomNumber);
         System.out.println("Portal record #: " + randomNumber);
         assert TestUtils.parseVgSales(portalRecord);
@@ -151,7 +151,7 @@ public class GetRecords {
     @Test
     public void getSortedRecords() {
         System.out.println("-----------------------");
-        System.out.println("getSortedRecord");
+        System.out.println("Get sorted records");
         System.out.println("-----------------------");
         FmSort fmSort = new FmSort()
                 .sortAsc("Genre")
@@ -171,7 +171,7 @@ public class GetRecords {
             assert false;
             return;
         }
-        FmData fmData = new FmData().create(response);
+        FmData fmData = new FmData(response);
         int max = fmData.size();
         FmRecord firstRecord = fmData.getRecord(0);
         int rank1 = Integer.valueOf(firstRecord.getValue("Rank"));
@@ -185,7 +185,7 @@ public class GetRecords {
     @Test
     public void getRecordsRunScript() {
         System.out.println("-----------------------");
-        System.out.println("getRecordsRunScript");
+        System.out.println("Get records and run script");
         System.out.println("-----------------------");
         FmScript script = new FmScript()
                 .setScript("log").setScriptParam("Hello from script")
@@ -209,10 +209,10 @@ public class GetRecords {
         }
         int scriptError = response.getScriptError();
         String scriptResult = response.getScriptResult();
-        int scriptErrorPreRequest = response.getScriptErrorPreRequest();
-        String scriptResultPreRequest = response.getScriptResultPreRequest();
-        int scriptErrorPreSort = response.getScriptErrorPreSort();
-        String scriptResultPreSort = response.getScriptResultPreSort();
+        int scriptErrorPreRequest = response.getPreRequestScriptError();
+        String scriptResultPreRequest = response.getPreRequestScriptResult();
+        int scriptErrorPreSort = response.getPreSortScriptError();
+        String scriptResultPreSort = response.getPreSortScriptResult();
         System.out.println("scriptResult: " + scriptResult);
         System.out.println("scriptResultPreRequest: " + scriptResultPreRequest);
         System.out.println("scriptResultPreSort: " + scriptResultPreSort);
@@ -231,7 +231,7 @@ public class GetRecords {
     @Test
     public void testInvalidGetRecord() {
         System.out.println("-----------------------");
-        System.out.println("testInvalidGetRecord");
+        System.out.println("Test invalid get record");
         System.out.println("-----------------------");
         FmRequest request;
         request = new FmRequest().getRecord(null, token, LAYOUT_VGSALES, 1).build();
