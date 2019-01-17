@@ -26,10 +26,14 @@ android {
                 it.buildConfigField 'String', 'API_HOST', '"' + System.getenv("API_HOST") + '"'
                 it.buildConfigField 'String', 'API_ACCOUNT', '"' + System.getenv("API_ACCOUNT") + '"'
                 it.buildConfigField 'String', 'API_PASSWORD', '"' + System.getenv("API_PASSWORD") + '"'
+                it.buildConfigField 'String', 'OAUTH_REQUEST_ID', ""
+                it.buildConfigField 'String', 'OAUTH_IDENTIFIER', ""
             }else{
                 it.buildConfigField 'String', 'API_HOST', API_HOST
                 it.buildConfigField 'String', 'API_ACCOUNT', API_ACCOUNT
                 it.buildConfigField 'String', 'API_PASSWORD', API_PASSWORD
+                it.buildConfigField 'String', 'OAUTH_REQUEST_ID', OAUTH_REQUEST_ID
+                it.buildConfigField 'String', 'OAUTH_IDENTIFIER', OAUTH_IDENTIFIER
             }
 
         }

@@ -29,8 +29,6 @@ import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
 public final class Fm {
-    private static final String GET = "GET";
-    private static final String DELETE = "DELETE";
     private static final String BASIC = "Basic";
     private static final String BEARER = "Bearer";
     public static FmResponse execute(FmRequest fmRequest) {
@@ -48,22 +46,13 @@ public final class Fm {
         if ( !request.isOk()){
             return null;
         }
-        String url = request.getEndpoint();
-        String method = request.getMethod();
-        String body = request.getBody();
-        String auth = getAuthString(request);
         if ( request.isSSLDisabled()){
             disableSSL();
         }
         FmResponse response = new FmResponse();
         HttpsURLConnection urlConnection;
         BufferedReader reader = null;
-        urlConnection = buildUrlConnection(
-                url,
-                method,
-                auth,
-                body
-        );
+        urlConnection = buildUrlConnection(request);
         if (urlConnection == null) {
             return null;
         }
@@ -111,16 +100,18 @@ public final class Fm {
     /**
      * buildUrlConnection
      *
-     * @param urlString  the url string
-     * @param method     the http method
-     * @param authString the authorization string
-     * @param body       the request's body
+     * @param request an FmRequest object
      * @return an HttpsUrlConnection object
      */
-    private static HttpsURLConnection buildUrlConnection(String urlString, String method, String authString, String body) {
+    private static HttpsURLConnection buildUrlConnection(FmRequest request) {
+        String fmMethod = request.getFmMethod();
+        String endpoint = request.getEndpoint();
+        String method = request.getMethod();
+        String body = request.getBody();
+        String auth = getAuthString(request);
         HttpsURLConnection urlConnection;
         URL url;
-        Uri builtUri = Uri.parse(urlString).buildUpon().build();
+        Uri builtUri = Uri.parse(endpoint).buildUpon().build();
         try {
             url = new URL(builtUri.toString());
         } catch (MalformedURLException e) {
@@ -131,7 +122,12 @@ public final class Fm {
             urlConnection = (HttpsURLConnection) url.openConnection();
             urlConnection.setRequestMethod(method);
             urlConnection.setRequestProperty("Content-Type", "application/json");
-            urlConnection.setRequestProperty("Authorization", authString);
+            if ( fmMethod.equals("LOGINOAUTH")){
+                urlConnection.setRequestProperty("X-FM-Data-OAuth-Request-Id", request.getoAuthRequestId());
+                urlConnection.setRequestProperty("X-FM-Data-OAuth-Identifier", request.getoAuthIdentifier());
+            } else{
+                urlConnection.setRequestProperty("Authorization", auth);
+            }
         } catch (IOException e) {
             e.printStackTrace();
             return null;

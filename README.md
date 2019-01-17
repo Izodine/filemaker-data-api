@@ -49,6 +49,8 @@ Use this class to create a request object that contains:
 * The information required by the API - like the url, credentials, and body
 * Other optional information created through support classes - like the sort, portal, and script parameters
 
+Complete the request by calling `build()` method.
+
 ### login(url, account, password)
 To log in to FileMaker and receive a token
 
@@ -64,6 +66,16 @@ To use the FileMaker Data API, you must log in with an account that has the fmre
     FmResponse response = Fm.execute(request);
     // Use the getToken() method to get the token
     String token = response.getToken();
+```
+
+### login(url, requestId, identifier)
+You can also use OAuth to authenticate. 
+
+**Usage**:
+```java
+    FmRequest request = new FmRequest()
+        .loginOAuth(url, requestId, identifier)
+        .build();
 ```
 
 ### logout(url, token)

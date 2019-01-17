@@ -14,6 +14,7 @@ public class FmRequest {
     private final String BASIC = "Basic";
     private final String BEARER = "Bearer";
     private static final String LOGIN = "LOGIN";
+    private static final String LOGINOAUTH = "LOGINOAUTH";
     private static final String LOGOUT = "LOGOUT";
     private static final String GETRECORDS = "GETRECORDS";
     private static final String GETRECORD = "GETRECORD";
@@ -26,6 +27,8 @@ public class FmRequest {
     private String method;
     private String auth;
     private String accountName;
+    private String oAuthRequestId;
+    private String oAuthIdentifier;
     private String password;
     private String layout;
     private String token;
@@ -50,6 +53,7 @@ public class FmRequest {
         this.disableSSL(false);
     }
     // TODO: Decide if the final URL will be created here or in the build method
+
     /**
      * login
      *
@@ -67,6 +71,28 @@ public class FmRequest {
         this.setMethod(POST);
         this.setAccountName(account);
         this.setPassword(password);
+        this.setBody(EMPTY_BODY);
+        this.setAuth(BASIC);
+        return this;
+    }
+
+    /**
+     * loginOAuth
+     *
+     * @param url        the FileMaker Data API url (ex: https://host/fmi/data/v1/databases/MyDatabase)
+     * @param requestId  the request id header value returned from /ouath/gettoauthurl
+     * @param identifier the oauth identifier
+     * @return
+     */
+    public FmRequest loginOAuth(@NonNull String url,
+                                @NonNull String requestId,
+                                @NonNull String identifier) {
+        String endpoint = url + "/sessions";
+        this.setFmMethod(LOGINOAUTH);
+        this.setEndpoint(endpoint);
+        this.setMethod(POST);
+        this.setoAuthRequestId(requestId);
+        this.setoAuthIdentifier(identifier);
         this.setBody(EMPTY_BODY);
         this.setAuth(BASIC);
         return this;
@@ -247,6 +273,9 @@ public class FmRequest {
                     this.setOk(true);
                     return this;
                 }
+            case LOGINOAUTH:
+                this.setOk(true);
+                return this;
             case LOGOUT:
                 if (this.getToken() == null || this.getToken().isEmpty()) {
                     this.setOk(false);
@@ -324,6 +353,7 @@ public class FmRequest {
     /**
      * buildParameters
      * A method to create the final parameters. Either in URL or JSON body format
+     *
      * @param endpoint the FileMaker Data API endpoint (ex: https://host/fmi/data/v1/databases/MyDatabase)
      * @param layout   the layout from where to retrieve the records
      * @param limit    the maximum number of records that should be returned
@@ -697,14 +727,18 @@ public class FmRequest {
     }
 
     /* ---------------------------------------------------------------------------------------------
-        Package private getters
-        ----------------------------------------------------------------------------------------------*/
+    Package private getters
+   ----------------------------------------------------------------------------------------------*/
     String getEndpoint() {
         return endpoint;
     }
 
     String getMethod() {
         return method;
+    }
+
+    String getFmMethod() {
+        return fmMethod;
     }
 
     int getRecordId() {
@@ -725,6 +759,22 @@ public class FmRequest {
 
     String getPassword() {
         return password;
+    }
+
+    String getoAuthRequestId() {
+        return oAuthRequestId;
+    }
+
+    void setoAuthRequestId(String oAuthRequestId) {
+        this.oAuthRequestId = oAuthRequestId;
+    }
+
+    public String getoAuthIdentifier() {
+        return oAuthIdentifier;
+    }
+
+    public void setoAuthIdentifier(String oAuthIdentifier) {
+        this.oAuthIdentifier = oAuthIdentifier;
     }
 
     boolean isSSLDisabled() {
