@@ -1,6 +1,6 @@
 # Android-Fm
 
-[![Build Status](https://travis-ci.com/joselopezrosario/filemaker-data-api.svg?branch=master)](https://travis-ci.com/joselopezrosario/filemaker-data-api) [![Download](https://api.bintray.com/packages/joselopezrosario/maven/android-fm/images/download.svg)](https://bintray.com/joselopezrosario/maven/android-fm/_latestVersion)
+[![HitCount](http://hits.dwyl.io/joselopezrosario/filemaker-data-api.svg)](http://hits.dwyl.io/joselopezrosario/filemaker-data-api) [![Build Status](https://travis-ci.com/joselopezrosario/filemaker-data-api.svg?branch=master)](https://travis-ci.com/joselopezrosario/filemaker-data-api) [![Download](https://api.bintray.com/packages/joselopezrosario/maven/android-fm/images/download.svg)](https://bintray.com/joselopezrosario/maven/android-fm/_latestVersion)
 
 An Android library to seamlessly interact with databases hosted on FileMaker Server 17+ through the Data API.
 
