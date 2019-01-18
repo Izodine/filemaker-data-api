@@ -124,11 +124,11 @@ artifacts {
 bintray {
 
     if (isRunningOnTravis) {
-        bintray.user = BINTRAY_USER
-        bintray.key = BINTRAY_KEY
-    }else{
         bintray.user = System.getenv("BINTRAY_USER")
         bintray.key = System.getenv("BINTRAY_KEY")
+    }else{
+        bintray.user = BINTRAY_USER
+        bintray.key = BINTRAY_KEY
     }
 
     bintray.configurations = ['archives']
