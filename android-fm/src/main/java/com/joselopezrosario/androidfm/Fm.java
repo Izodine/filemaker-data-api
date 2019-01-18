@@ -43,9 +43,6 @@ public final class Fm {
      * @return an FmResponse object
      */
     private static FmResponse processExecute(FmRequest request) {
-        if ( !request.isOk()){
-            return null;
-        }
         if ( request.isSSLDisabled()){
             disableSSL();
         }
@@ -106,7 +103,7 @@ public final class Fm {
     private static HttpsURLConnection buildUrlConnection(FmRequest request) {
         String fmMethod = request.getFmMethod();
         String endpoint = request.getEndpoint();
-        String method = request.getMethod();
+        String method = request.getHttpMethod();
         String body = request.getBody();
         String auth = getAuthString(request);
         HttpsURLConnection urlConnection;

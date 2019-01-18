@@ -5,7 +5,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 public class FmResponse {
-    private static final String TOKEN = "token";
     private static final String SCRIPT_ERROR = "scriptError";
     private static final String SCRIPT_RESULT = "scriptResult";
     private static final String SCRIPT_ERROR_PREREQUEST = "scriptError.prerequest";
@@ -90,6 +89,14 @@ public class FmResponse {
         return ScriptResultPreSort;
     }
 
+    public int getRecordId() {
+        return recordId;
+    }
+
+    public int getModId() {
+        return modId;
+    }
+
     /*------------------------------------------------------------------------------------------
     Package private setters
     ------------------------------------------------------------------------------------------*/
@@ -104,7 +111,7 @@ public class FmResponse {
     /**
      * setFmMessageArray
      *
-     * @param fmMessageArray
+     * @param fmMessageArray the messages element from the FileMaker Data API response
      */
     void setFmMessageArray(JSONArray fmMessageArray) {
         this.fmMessageArray = fmMessageArray;
@@ -191,19 +198,11 @@ public class FmResponse {
     Package private getters
     ------------------------------------------------------------------------------------------*/
     String getHttpMessage() {
-        return httpMessage;
+        return this.httpMessage;
     }
 
     JSONObject getFmResponse() {
-        return fmResponse;
-    }
-
-    public int getRecordId() {
-        return recordId;
-    }
-
-    public int getModId() {
-        return modId;
+        return this.fmResponse;
     }
 
     /*------------------------------------------------------------------------------------------
@@ -251,9 +250,9 @@ public class FmResponse {
     }
 
     /*----------------------------------------------------------------------------------------------
-        Private setters
+        Private getters
     ----------------------------------------------------------------------------------------------*/
     private JSONArray getFmMessageArray() {
-        return fmMessageArray;
+        return this.fmMessageArray;
     }
 }

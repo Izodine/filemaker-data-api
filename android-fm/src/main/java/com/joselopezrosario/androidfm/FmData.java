@@ -86,6 +86,7 @@ public class FmData {
             this.setData(response.getFmResponse().getJSONArray("data"));
             return this;
         } catch (JSONException e) {
+            this.setError(e.toString());
             e.printStackTrace();
             return null;
         }

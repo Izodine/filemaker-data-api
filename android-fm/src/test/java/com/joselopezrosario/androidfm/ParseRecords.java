@@ -23,10 +23,6 @@ public class ParseRecords {
         FmRequest loginRequest = new FmRequest()
                 .login(ENDPOINT, ACCOUNT, PASSWORD)
                 .build();
-        if (!loginRequest.isOk()) {
-            assert false;
-            return;
-        }
         FmResponse loginResponse = Fm.execute(loginRequest);
         if (!loginResponse.isOk()) {
             assert false;
@@ -83,10 +79,6 @@ public class ParseRecords {
         FmRequest request = new FmRequest()
                 .logout(ENDPOINT, token)
                 .build();
-        if (!request.isOk()) {
-            assert false;
-            return;
-        }
         FmResponse response = Fm.execute(request);
         if (!response.isOk()) {
             assert false;

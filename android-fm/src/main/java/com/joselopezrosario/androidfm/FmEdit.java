@@ -56,7 +56,6 @@ public class FmEdit {
         return this.values.get(index);
     }
 
-    // TODO: Convert this to a Utility? It's the same code under FmFind
     /**
      * getString
      * Get all the edit values in JSON string format
@@ -64,21 +63,7 @@ public class FmEdit {
      * @return a JSON formatted string of field name value pairs
      */
     String getString() {
-        if (this.values == null) {
-            return null;
-        }
-        int size = values.size();
-        StringBuilder string = new StringBuilder();
-        int i = 0;
-        while (i < size) {
-            Value value = values.get(i);
-            if (i == 0) {
-                string = string.append(value.getFieldName()).append(":").append(value.getFieldValue());
-            } else {
-                string = string.append(",").append(value.getFieldName()).append(":").append(value.getFieldValue());
-            }
-            i++;
-        }
+        StringBuilder string = Util.valuestoString(this.values);
         return "{" + string + "}";
     }
 }

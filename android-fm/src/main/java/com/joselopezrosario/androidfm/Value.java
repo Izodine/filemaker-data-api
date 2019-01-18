@@ -2,7 +2,7 @@ package com.joselopezrosario.androidfm;
 
 /**
  * Value
- * A class to manage field name value pair objects for FmFind and FmEdit objects
+ * A class to manage field name value pair objects for FmFind, FmEdit, and FmGlobal objects
  */
 class Value {
     private String fieldName;

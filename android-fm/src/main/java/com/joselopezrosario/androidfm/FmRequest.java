@@ -20,11 +20,15 @@ public class FmRequest {
     private static final String GETRECORD = "GETRECORD";
     private static final String FINDRECORDS = "FINDRECORDS";
     private static final String CREATE = "CREATE";
+    private static final String SESSIONS = "/sessions";
+    private static final String LAYOUTS = "/layouts/";
+    private static final String RECORDS = "/records";
+    private static final String _FIND = "/_find";
     private boolean disableSSL;
     private String fmMethod;
     private String endpoint;
     private int recordId;
-    private String method;
+    private String httpMethod;
     private String auth;
     private String accountName;
     private String oAuthRequestId;
@@ -41,18 +45,11 @@ public class FmRequest {
     private FmEdit fmEdit;
     private String body;
     private String message;
-    private Boolean success;
 
     public FmRequest() {
-        this.setLayout(null);
-        this.setSortParams(null);
-        this.setPortalParams(null);
-        this.setOk(false);
-        this.setAccountName(null);
-        this.setPassword(null);
         this.disableSSL(false);
     }
-    // TODO: Decide if the final URL will be created here or in the build method
+    // TODO: Decide if the final URL will be created here or in the build httpMethod
 
     /**
      * login
@@ -62,15 +59,12 @@ public class FmRequest {
      * @param password the FileMaker account's password
      * @return an FmRequest object
      */
-    public FmRequest login(@NonNull String url,
-                           @NonNull String account,
-                           @NonNull String password) {
-        String endpoint = url + "/sessions";
-        this.setFmMethod(LOGIN);
-        this.setEndpoint(endpoint);
-        this.setMethod(POST);
+    public FmRequest login(@NonNull String url, @NonNull String account, @NonNull String password) {
+        this.setEndpoint(url);
         this.setAccountName(account);
         this.setPassword(password);
+        this.setFmMethod(LOGIN);
+        this.setHttpMethod(POST);
         this.setBody(EMPTY_BODY);
         this.setAuth(BASIC);
         return this;
@@ -84,13 +78,11 @@ public class FmRequest {
      * @param identifier the oauth identifier
      * @return
      */
-    public FmRequest loginOAuth(@NonNull String url,
-                                @NonNull String requestId,
-                                @NonNull String identifier) {
-        String endpoint = url + "/sessions";
+    public FmRequest loginOAuth(@NonNull String url, @NonNull String requestId, @NonNull String identifier) {
+        String endpoint = url + "/" + SESSIONS;
         this.setFmMethod(LOGINOAUTH);
         this.setEndpoint(endpoint);
-        this.setMethod(POST);
+        this.setHttpMethod(POST);
         this.setoAuthRequestId(requestId);
         this.setoAuthIdentifier(identifier);
         this.setBody(EMPTY_BODY);
@@ -105,12 +97,11 @@ public class FmRequest {
      * @param token the token returned in the response by executing the login request
      * @return an FmRequest object
      */
-    public FmRequest logout(@NonNull String url,
-                            @NonNull String token) {
-        String endpoint = url + "/sessions/" + token;
+    public FmRequest logout(@NonNull String url, @NonNull String token) {
+        String endpoint = url + "/" + SESSIONS + "/" + token;
         this.setFmMethod(LOGOUT);
         this.setEndpoint(endpoint);
-        this.setMethod(DELETE);
+        this.setHttpMethod(DELETE);
         this.setToken(token);
         this.setBody(EMPTY_BODY);
         this.setAuth(BEARER);
@@ -125,14 +116,12 @@ public class FmRequest {
      * @param layout the layout from where to retrieve the records
      * @return an FmRequest object
      */
-    public FmRequest getRecords(@NonNull String url,
-                                @NonNull String token,
-                                @NonNull String layout) {
-        this.setFmMethod(GETRECORDS);
+    public FmRequest getRecords(@NonNull String url, @NonNull String token, @NonNull String layout) {
         this.setEndpoint(url);
         this.setToken(token);
         this.setLayout(layout);
-        this.setMethod(GET);
+        this.setFmMethod(GETRECORDS);
+        this.setHttpMethod(GET);
         this.setAuth(BEARER);
         return this;
     }
@@ -145,16 +134,13 @@ public class FmRequest {
      * @param layout the layout from where to retrieve the records
      * @return an FmRequest object
      */
-    public FmRequest getRecord(@NonNull String url,
-                               @NonNull String token,
-                               @NonNull String layout,
-                               @NonNull int recordId) {
+    public FmRequest getRecord(@NonNull String url, @NonNull String token, @NonNull String layout, @NonNull int recordId) {
         this.setFmMethod(GETRECORD);
         this.setRecordId(recordId);
         this.setEndpoint(url);
         this.setToken(token);
         this.setLayout(layout);
-        this.setMethod(GET);
+        this.setHttpMethod(GET);
         this.setAuth(BEARER);
         return this;
     }
@@ -168,16 +154,13 @@ public class FmRequest {
      * @param fmFind an FmFind object containing the find request(s)
      * @return an FmRequest object
      */
-    public FmRequest findRecords(@NonNull String url,
-                                 @NonNull String token,
-                                 @NonNull String layout,
-                                 @NonNull FmFind fmFind) {
-        this.setFmMethod(FINDRECORDS);
+    public FmRequest findRecords(@NonNull String url, @NonNull String token, @NonNull String layout, @NonNull FmFind fmFind) {
         this.setEndpoint(url);
         this.setToken(token);
         this.setLayout(layout);
-        this.setMethod(POST);
         this.setFmFind(fmFind);
+        this.setFmMethod(FINDRECORDS);
+        this.setHttpMethod(POST);
         this.setAuth(BEARER);
         return this;
     }
@@ -192,16 +175,13 @@ public class FmRequest {
      * @param fmEdit an FmEdit object containing Value field name value pair objects
      * @return an FmRequest object
      */
-    public FmRequest create(@NonNull String url,
-                            @NonNull String token,
-                            @NonNull String layout,
-                            @NonNull FmEdit fmEdit) {
-        this.setFmMethod(CREATE);
-        this.setEndpoint(url + "/layouts/" + layout + "/records");
+    public FmRequest create(@NonNull String url, @NonNull String token, @NonNull String layout, @NonNull FmEdit fmEdit) {
+        this.setEndpoint(url);
         this.setToken(token);
         this.setLayout(layout);
-        this.setMethod(POST);
         this.setEditParams(fmEdit);
+        this.setFmMethod(CREATE);
+        this.setHttpMethod(POST);
         this.setAuth(BEARER);
         return this;
     }
@@ -215,29 +195,33 @@ public class FmRequest {
      * @param layout the layout from where to create the record
      * @return an FmRequest object
      */
-    public FmRequest create(@NonNull String url,
-                            @NonNull String token,
-                            @NonNull String layout) {
-        this.setFmMethod(CREATE);
+    public FmRequest create(@NonNull String url, @NonNull String token, @NonNull String layout) {
         this.setEndpoint(url);
         this.setToken(token);
         this.setLayout(layout);
-        this.setMethod(POST);
         this.setEditParams(new FmEdit());
+        this.setFmMethod(CREATE);
+        this.setHttpMethod(POST);
         this.setAuth(BEARER);
         return this;
     }
 
-    public FmRequest delete(@NonNull String url,
-                            @NonNull String token,
-                            @NonNull String layout,
-                            @NonNull int recordId) {
-        this.setFmMethod(DELETE);
-        this.setRecordId(recordId);
+    /**
+     * delete
+     * Delete a record by its id
+     * @param url    the FileMaker Data API url (ex: https://host/fmi/data/v1/databases/MyDatabase)
+     * @param token  the token returned in the response by executing the login request
+     * @param layout the layout from where to create the record
+     * @param recordId the record's id
+     * @return an FmRequest object
+     */
+    public FmRequest delete(@NonNull String url, @NonNull String token, @NonNull String layout, int recordId) {
         this.setEndpoint(url);
         this.setToken(token);
         this.setLayout(layout);
-        this.setMethod(DELETE);
+        this.setRecordId(recordId);
+        this.setFmMethod(DELETE);
+        this.setHttpMethod(DELETE);
         this.setAuth(BEARER);
         return this;
 
@@ -245,105 +229,33 @@ public class FmRequest {
 
     /**
      * build
-     * Make sure that all required parameters are valid before returning the final request object.
-     * If there's an error, the request success field (accessed through isOk()) will return false.
-     * Additional informational about the error will be setName in the message field (accessed through getMessage()).
+     * Build the final end point and add any parameters if needed
      *
      * @return an FmRequest object
      */
     public FmRequest build() {
-        // Common validation. All methods need this.
-        if (this.getEndpoint() == null || this.getEndpoint().isEmpty()) {
-            this.setOk(false);
-            this.setMessage("Invalid endpoint: " + this.getEndpoint());
-            return this;
-        }
-        // TODO: Improve the validation. Perhaps create a validate method with groups to remove duplicate code
         switch (fmMethod) {
             case LOGIN:
-                if (this.getAccountName() == null || this.getAccountName().isEmpty()) {
-                    this.setOk(false);
-                    this.setMessage("Invalid account name: " + this.getAccountName());
-                    return this;
-                } else if (this.getPassword() == null || this.getPassword().isEmpty()) {
-                    this.setOk(false);
-                    this.setMessage("Invalid password: " + this.getPassword());
-                    return this;
-                } else {
-                    this.setOk(true);
-                    return this;
-                }
+                this.setEndpoint(this.getEndpoint() + SESSIONS);
+                return this;
             case LOGINOAUTH:
-                this.setOk(true);
                 return this;
             case LOGOUT:
-                if (this.getToken() == null || this.getToken().isEmpty()) {
-                    this.setOk(false);
-                    this.setMessage("Invalid token: " + this.getToken());
-                    return this;
-                } else {
-                    this.setOk(true);
-                    return this;
-                }
-            case GETRECORD:
-                if (this.getToken() == null || this.getToken().isEmpty()) {
-                    this.setOk(false);
-                    this.setMessage("Invalid token: " + this.getToken());
-                    return this;
-                } else if (this.getLayout() == null || this.getLayout().isEmpty()) {
-                    this.setOk(false);
-                    this.setMessage("Invalid layout: " + this.getLayout());
-                    return this;
-                } else if (this.getRecordId() < 1) {
-                    this.setMessage("Invalid record id: " + this.getRecordId());
-                    return this;
-                } else {
-                    this.setEndpoint(endpoint + "/layouts/" + layout + "/records/" + recordId);
-                    this.setOk(true);
-                    return this;
-                }
+                return this;
             case GETRECORDS:
-                if (this.getToken() == null || this.getToken().isEmpty()) {
-                    this.setOk(false);
-                    this.setMessage("Invalid token: " + this.getToken());
-                    return this;
-                } else if (this.getLayout() == null || this.getLayout().isEmpty()) {
-                    this.setOk(false);
-                    this.setMessage("Invalid layout: " + this.getLayout());
-                    return this;
-                } else {
-                    this.setOk(true);
-                    return buildParameters(this.endpoint, this.layout, null,
-                            this.limit, this.offset, this.fmSort, this.fmPortal, this.fmScript, null);
-                }
-            case FINDRECORDS:
-                if (this.getToken() == null || this.getToken().isEmpty()) {
-                    this.setOk(false);
-                    this.setMessage("Invalid token: " + this.getToken());
-                    return this;
-                } else if (this.fmFind == null) {
-                    this.setOk(false);
-                    this.setMessage("No find criteria specified");
-                    return this;
-                } else if (this.getLayout() == null || this.getLayout().isEmpty()) {
-                    this.setOk(false);
-                    this.setMessage("Invalid layout: " + this.getLayout());
-                    return this;
-                } else {
-                    this.setOk(true);
-                    this.setEndpoint(endpoint + "/layouts/" + layout + "/_find");
-                    return buildParameters(this.endpoint, this.layout, this.fmFind,
-                            this.limit, this.offset, this.fmSort, this.fmPortal, this.fmScript, null);
-                }
-
+                this.setEndpoint(this.getEndpoint() + LAYOUTS + layout + RECORDS);
+                return buildParameters(null, this.limit, this.offset, this.fmSort, this.fmPortal, this.fmScript, null);
+            case GETRECORD:
+                this.setEndpoint(this.getEndpoint() + LAYOUTS + layout + RECORDS + "/" + recordId);
+                return this; case FINDRECORDS:
+                this.setEndpoint(endpoint + LAYOUTS + layout + _FIND);
+                return buildParameters(this.fmFind, this.limit, this.offset, this.fmSort, this.fmPortal, this.fmScript, null);
             case CREATE:
-                this.setOk(true);
-                return buildParameters(this.endpoint, this.layout, this.fmFind,
-                        this.limit, this.offset, this.fmSort, this.fmPortal, this.fmScript, this.fmEdit);
+                this.setEndpoint(endpoint + LAYOUTS + layout + RECORDS);
+                return buildParameters(this.fmFind, this.limit, this.offset, this.fmSort, this.fmPortal, this.fmScript, this.fmEdit);
             case DELETE:
-                this.setOk(true);
-                return buildParameters(this.endpoint, this.layout, null,
-                        null, null, null, null, this.fmScript, null);
+                this.setEndpoint(endpoint + LAYOUTS + layout + RECORDS + "/" + this.recordId);
+                return buildParameters(null, null, null, null, null, this.fmScript, null);
             default:
                 return null;
         }
@@ -352,19 +264,15 @@ public class FmRequest {
 
     /**
      * buildParameters
-     * A method to create the final parameters. Either in URL or JSON body format
+     * A httpMethod to create the final parameters. Either in URL or JSON body format
      *
-     * @param endpoint the FileMaker Data API endpoint (ex: https://host/fmi/data/v1/databases/MyDatabase)
-     * @param layout   the layout from where to retrieve the records
      * @param limit    the maximum number of records that should be returned
      * @param offset   the record number of the first record in the range of records
      * @param fmSort   an ArrayList of sort parameter objects
      * @param fmPortal an ArrayList of portal parameter objects
      * @return the final FmRequest object
      */
-    private FmRequest buildParameters(String endpoint,
-                                      String layout,
-                                      @Nullable FmFind fmFind,
+    private FmRequest buildParameters(@Nullable FmFind fmFind,
                                       @Nullable String limit,
                                       @Nullable String offset,
                                       @Nullable FmSort fmSort,
@@ -372,7 +280,7 @@ public class FmRequest {
                                       @Nullable FmScript fmScript,
                                       @Nullable FmEdit fmEdit) {
         int type;
-        if (this.getMethod().equals(GET)) {
+        if (this.getFmMethod().equals(GETRECORDS)) {
             type = 1;
         } else {
             type = 2;
@@ -444,15 +352,19 @@ public class FmRequest {
         /*------------------------------------------------------------------------------------------
         Build the final parameters string and append to url or set to body accordingly
         ------------------------------------------------------------------------------------------*/
-        if (this.fmMethod.equals(GETRECORDS)) {
-            params = "?" + android.text.TextUtils.join("&", paramsArray);
-            this.setEndpoint(endpoint + "/layouts/" + layout + "/records" + params);
-        } else if (this.fmMethod.equals(DELETE)) {
-            params = "?" + android.text.TextUtils.join("&", paramsArray);
-            this.setEndpoint(endpoint + "/layouts/" + layout + "/records/" + this.recordId + params);
-        } else {
-            params = "{" + android.text.TextUtils.join(",", paramsArray) + "}";
-            this.setBody(params);
+        switch (this.fmMethod) {
+            case GETRECORDS:
+                params = "?" + android.text.TextUtils.join("&", paramsArray);
+                this.setEndpoint(this.getEndpoint() + params);
+                return this;
+            case FINDRECORDS:
+                params = "{" + android.text.TextUtils.join(",", paramsArray) + "}";
+                this.setBody(params);
+                return this;
+            case CREATE:
+                params = "{" + android.text.TextUtils.join(",", paramsArray) + "}";
+                this.setBody(params);
+                return this;
         }
         return this;
     }
@@ -623,10 +535,6 @@ public class FmRequest {
         return this.token;
     }
 
-    public Boolean isOk() {
-        return success;
-    }
-
     public String getMessage() {
         return message;
     }
@@ -677,8 +585,8 @@ public class FmRequest {
         this.endpoint = endpoint;
     }
 
-    private void setMethod(String method) {
-        this.method = method;
+    private void setHttpMethod(String httpMethod) {
+        this.httpMethod = httpMethod;
     }
 
     private void setFmFind(FmFind fmFind) {
@@ -686,7 +594,6 @@ public class FmRequest {
     }
 
     private void setBody(String body) {
-        // TODO: Convert to JSON string
         this.body = body;
     }
 
@@ -704,10 +611,6 @@ public class FmRequest {
 
     private void setToken(String token) {
         this.token = token;
-    }
-
-    private void setOk(Boolean success) {
-        this.success = success;
     }
 
     private void setFmMethod(String fmMethod) {
@@ -733,8 +636,8 @@ public class FmRequest {
         return endpoint;
     }
 
-    String getMethod() {
-        return method;
+    String getHttpMethod() {
+        return httpMethod;
     }
 
     String getFmMethod() {

@@ -23,10 +23,6 @@ public class CreateDelete {
         FmRequest loginRequest = new FmRequest()
                 .login(ENDPOINT, ACCOUNT, PASSWORD)
                 .build();
-        if (!loginRequest.isOk()) {
-            assert false;
-            return;
-        }
         FmResponse loginResponse = Fm.execute(loginRequest);
         if (!loginResponse.isOk()) {
             assert false;
@@ -96,12 +92,20 @@ public class CreateDelete {
                 .create(ENDPOINT, token, LAYOUT_VGSALES, edit)
                 .build();
         FmResponse response = Fm.execute(request);
+        if ( !response.isOk()){
+            assert false;
+            return;
+        }
         int recordId = response.getRecordId();
         request = new FmRequest()
                 .getRecord(ENDPOINT, token, LAYOUT_VGSALES, recordId)
                 .build();
         response = Fm.execute(request);
         FmData fmData = new FmData(response);
+        if (!response.isOk()) {
+            assert false;
+            return;
+        }
         TestUtils.parseVgSales(fmData.getRecord(0));
         assert response.isOk();
 
@@ -113,10 +117,6 @@ public class CreateDelete {
         FmRequest request = new FmRequest()
                 .logout(ENDPOINT, token)
                 .build();
-        if (!request.isOk()) {
-            assert false;
-            return;
-        }
         FmResponse response = Fm.execute(request);
         if (!response.isOk()) {
             assert false;

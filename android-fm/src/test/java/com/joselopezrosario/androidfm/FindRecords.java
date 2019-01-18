@@ -25,10 +25,6 @@ public class FindRecords {
         FmRequest loginRequest = new FmRequest()
                 .login(ENDPOINT, ACCOUNT, PASSWORD)
                 .build();
-        if (!loginRequest.isOk()) {
-            assert false;
-            return;
-        }
         FmResponse loginResponse = Fm.execute(loginRequest);
         if (!loginResponse.isOk()) {
             assert false;
@@ -54,6 +50,10 @@ public class FindRecords {
                 .build();
         FmResponse response = Fm.execute(request);
         FmData fmData = new FmData(response);
+        if (!response.isOk()) {
+            assert false;
+            return;
+        }
         int foundcount = fmData.size();
         System.out.println("Foundcount: " + foundcount);
         assert findGames.countQueries() == 6 && fmData.size() > 0;
@@ -81,10 +81,6 @@ public class FindRecords {
                 .findRecords(ENDPOINT, token, LAYOUT_GENRES, findGames)
                 .setPortalParams(fmPortal)
                 .build();
-        if (!request.isOk()) {
-            assert false;
-            return;
-        }
         FmResponse response = Fm.execute(request);
         if (!response.isOk()) {
             assert false;
@@ -109,10 +105,6 @@ public class FindRecords {
         FmRequest request = new FmRequest()
                 .logout(ENDPOINT, token)
                 .build();
-        if (!request.isOk()) {
-            assert false;
-            return;
-        }
         FmResponse response = Fm.execute(request);
         if (!response.isOk()) {
             assert false;

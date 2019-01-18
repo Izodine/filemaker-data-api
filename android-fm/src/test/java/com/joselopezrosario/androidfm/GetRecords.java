@@ -26,10 +26,6 @@ public class GetRecords {
         FmRequest loginRequest = new FmRequest()
                 .login(ENDPOINT, ACCOUNT, PASSWORD)
                 .build();
-        if (!loginRequest.isOk()) {
-            assert false;
-            return;
-        }
         FmResponse loginResponse = Fm.execute(loginRequest);
         if (!loginResponse.isOk()) {
             assert false;
@@ -57,12 +53,12 @@ public class GetRecords {
                 .setLimit(100)
                 .setOffset(1)
                 .build();
-        if (!request.isOk()) {
+        FmResponse response = Fm.execute(request);
+        FmData fmData = new FmData(response);
+        if (!response.isOk()) {
             assert false;
             return;
         }
-        FmResponse response = Fm.execute(request);
-        FmData fmData = new FmData(response);
         int max = fmData.size() - 1;
         System.out.println("Total records: " + max);
         int randomNum = ThreadLocalRandom.current().nextInt(0, max);
@@ -86,10 +82,6 @@ public class GetRecords {
                 .setLimit(3000)
                 .setOffset(1)
                 .build();
-        if (!request.isOk()) {
-            assert false;
-            return;
-        }
         FmResponse response = Fm.execute(request);
         FmData fmData = new FmData(response);
         int max = fmData.size() - 1;
@@ -103,11 +95,11 @@ public class GetRecords {
                 .setLimit(1)
                 .setOffset(1)
                 .build();
-        if (!request.isOk()) {
+        response = Fm.execute(request);
+        if (!response.isOk()) {
             assert false;
             return;
         }
-        response = Fm.execute(request);
         fmData = new FmData(response);
         record = fmData.getRecord(0);
         assert TestUtils.parseVgSales(record);
@@ -128,10 +120,6 @@ public class GetRecords {
                 .setOffset(1)
                 .setPortalParams(fmPortal)
                 .build();
-        if (!request.isOk()) {
-            assert false;
-            return;
-        }
         FmResponse response = Fm.execute(request);
         if (!response.isOk()) {
             assert false;
@@ -162,10 +150,6 @@ public class GetRecords {
                 .setOffset(1)
                 .setSortParams(fmSort)
                 .build();
-        if (!request.isOk()) {
-            assert false;
-            return;
-        }
         FmResponse response = Fm.execute(request);
         if (!response.isOk()) {
             assert false;
@@ -198,10 +182,6 @@ public class GetRecords {
                 .setOffset(1)
                 .setScriptPrams(script)
                 .build();
-        if (!request.isOk()) {
-            assert false;
-            return;
-        }
         FmResponse response = Fm.execute(request);
         if (!response.isOk()) {
             assert false;
@@ -224,52 +204,11 @@ public class GetRecords {
                 && scriptResultPreSort.equals("Ok");
     }
 
-    /**
-     * testInvalidGetRecord
-     * Test all the different cases in which the FmRequest.build() method on getRecord() fails.
-     */
-    @Test
-    public void testInvalidGetRecord() {
-        System.out.println("-----------------------");
-        System.out.println("Test invalid get record");
-        System.out.println("-----------------------");
-        FmRequest request;
-        request = new FmRequest().getRecord(null, token, LAYOUT_VGSALES, 1).build();
-        System.out.println("Error: " + request.getMessage());
-        assert !request.isOk();
-        request = new FmRequest().getRecord("", token, LAYOUT_VGSALES, 1).build();
-        System.out.println("Error: " + request.getMessage());
-        assert !request.isOk();
-        request = new FmRequest().getRecord(ENDPOINT, null, LAYOUT_VGSALES, 1).build();
-        System.out.println("Error: " + request.getMessage());
-        assert !request.isOk();
-        request = new FmRequest().getRecord(ENDPOINT, "", LAYOUT_VGSALES, 1).build();
-        System.out.println("Error: " + request.getMessage());
-        assert !request.isOk();
-        request = new FmRequest().getRecord(ENDPOINT, token, null, 1).build();
-        System.out.println("Error: " + request.getMessage());
-        assert !request.isOk();
-        request = new FmRequest().getRecord(ENDPOINT, token, "", 1).build();
-        System.out.println("Error: " + request.getMessage());
-        assert !request.isOk();
-        request = new FmRequest().getRecord(ENDPOINT, token, LAYOUT_VGSALES, 0).build();
-        System.out.println("Error: " + request.getMessage());
-        assert !request.isOk();
-        request = new FmRequest().getRecord(ENDPOINT, token, LAYOUT_VGSALES, -1).build();
-        System.out.println("Error: " + request.getMessage());
-        assert !request.isOk();
-
-    }
-
     @AfterClass
     public static void logout() {
         FmRequest request = new FmRequest()
                 .logout(ENDPOINT, token)
                 .build();
-        if (!request.isOk()) {
-            assert false;
-            return;
-        }
         FmResponse response = Fm.execute(request);
         if (!response.isOk()) {
             assert false;
