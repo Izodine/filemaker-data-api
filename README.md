@@ -17,10 +17,10 @@ repositories {
 }
 ```
 
-Add the dependency to your application's build.gradle file.
+And then add the dependency to your application's build.gradle file (use the latest version).
 
 ```groovy
-    implementation 'com.joselopezrosario:android-fm:0.0.1'
+    implementation 'com.joselopezrosario:android-fm:+'
 ```
 ___
 # About the following examples

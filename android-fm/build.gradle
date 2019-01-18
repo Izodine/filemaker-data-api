@@ -2,6 +2,8 @@ apply plugin: 'com.android.library'
 apply plugin: 'com.github.dcendents.android-maven'
 apply plugin: 'com.jfrog.bintray'
 
+def isRunningOnTravis = System.getenv("CI") == "true"
+
 android {
     compileSdkVersion 28
     defaultConfig {
@@ -21,7 +23,7 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
         buildTypes.each {
-            def isRunningOnTravis = System.getenv("CI") == "true"
+            println(isRunningOnTravis)
             if (isRunningOnTravis) {
                 it.buildConfigField 'String', 'API_HOST', '"' + System.getenv("API_HOST") + '"'
                 it.buildConfigField 'String', 'API_ACCOUNT', '"' + System.getenv("API_ACCOUNT") + '"'
@@ -53,7 +55,7 @@ ext {
     siteUrl = 'https://github.com/joselopezrosario/filemaker-data-api'
     gitUrl = 'https://github.com/joselopezrosario/filemaker-data-api.git'
 
-    libraryVersion = '0.0.1'
+    libraryVersion = '0.0.2'
 
     developerId = 'joselopezrosario'
     developerName = 'Jose Lopez'
@@ -119,13 +121,15 @@ artifacts {
     archives sourcesJar
 }
 
-Properties properties = new Properties()
-properties.load(project.rootProject.file('local.properties').newDataInputStream())
-
 bintray {
 
-    user = properties.getProperty("bintray.user")
-    key = properties.getProperty("bintray.apikey")
+    if (isRunningOnTravis) {
+        bintray.user = BINTRAY_USER
+        bintray.key = BINTRAY_KEY
+    }else{
+        bintray.user = System.getenv("BINTRAY_USER")
+        bintray.key = System.getenv("BINTRAY_KEY")
+    }
 
     bintray.configurations = ['archives']
     pkg {
