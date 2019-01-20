@@ -29,25 +29,48 @@ public class FmResponse {
     private int modId;
 
 
+    /**
+     * FmResponse
+     * A class to handle the response from the FileMaker Server Data API.
+     */
     public FmResponse() {
+        // Set the int values to -1 to prevent false positives
+        this.setHttpCode(-1);
+        this.setFmMessageCode(-1);
+        this.setScriptError(-1);
+        this.setScriptErrorPreRequest(-1);
+        this.setScriptErrorPreSort(-1);
+        this.setRecordId(-1);
+        this.setModId(-1);
     }
 
     /*------------------------------------------------------------------------------------------
     Public getters
     ------------------------------------------------------------------------------------------*/
 
+    /**
+     * getHttpCode
+     *
+     * @return the server's http response code (for example, 200 for success)
+     */
     public int getHttpCode() {
         return httpCode;
     }
 
     /**
      * isOk
-     * @return true of the FileMaker response message code = 0
+     *
+     * @return true if the FileMaker response message code = 0
      */
     public Boolean isOk() {
         return getFmMessageCode() == 0;
     }
 
+    /**
+     * getToken
+     *
+     * @return get the token from the response (applies to login and OAuthLogin).
+     */
     public String getToken() {
         try {
             return this.getFmResponse().getString("token");
@@ -57,10 +80,20 @@ public class FmResponse {
         return null;
     }
 
+    /**
+     * getFmMessageCode
+     *
+     * @return the FileMaker response message code (for example, 0 for success)
+     */
     public int getFmMessageCode() {
         return fmMessageCode;
     }
 
+    /**
+     * getFmMessage
+     *
+     * @return the FileMaker response message (for example, Ok for success)
+     */
     public String getFmMessage() {
         return fmMessage;
     }

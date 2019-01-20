@@ -55,7 +55,7 @@ ext {
     siteUrl = 'https://github.com/joselopezrosario/filemaker-data-api'
     gitUrl = 'https://github.com/joselopezrosario/filemaker-data-api.git'
 
-    libraryVersion = '0.0.3'
+    libraryVersion = '0.0.4'
 
     developerId = 'joselopezrosario'
     developerName = 'Jose Lopez'
