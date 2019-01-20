@@ -32,7 +32,7 @@ public class CreateDelete {
     }
 
     @Test
-    public void createBlankRecordAndDeleteIt(){
+    public void createBlankRecordAndDeleteIt() {
         System.out.println("-----------------------");
         System.out.println("Create blank record and delete it");
         System.out.println("-----------------------");
@@ -50,7 +50,7 @@ public class CreateDelete {
     }
 
     @Test
-    public void createBlankRecordAndDeleteItWithScripts(){
+    public void createBlankRecordAndDeleteItWithScripts() {
         System.out.println("-----------------------");
         System.out.println("Create blank record, delete it, and run script");
         System.out.println("-----------------------");
@@ -58,7 +58,7 @@ public class CreateDelete {
                 .create(ENDPOINT, token, LAYOUT_VGSALES)
                 .build();
         FmResponse response = Fm.execute(request);
-        if ( !response.isOk()){
+        if (!response.isOk()) {
             assert false;
             return;
         }
@@ -82,17 +82,18 @@ public class CreateDelete {
         System.out.println("Create a record and set values");
         System.out.println("-----------------------");
         FmEdit edit = new FmEdit()
-                .set("Rank", "999732")
+                .set("Rank", 999732)
                 .set("Name", "Jose's game")
                 .set("Publisher", "Lorem ipsum")
                 .set("Genre", "Arcade")
                 .set("Platform", "Nes")
-                .set("Year", "1981");
+                .set("Year", 1981)
+                .set("Global_Sales", 100.50);
         FmRequest request = new FmRequest()
                 .create(ENDPOINT, token, LAYOUT_VGSALES, edit)
                 .build();
         FmResponse response = Fm.execute(request);
-        if ( !response.isOk()){
+        if (!response.isOk()) {
             assert false;
             return;
         }

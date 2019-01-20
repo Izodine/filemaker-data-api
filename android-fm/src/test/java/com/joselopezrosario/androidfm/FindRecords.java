@@ -42,9 +42,9 @@ public class FindRecords {
         System.out.println("Find Records");
         System.out.println("-----------------------");
         FmFind findGames = new FmFind()
-                .newRequest().set("Publisher", "Nintendo").set("Year", "1985")
+                .newRequest().set("Publisher", "Nintendo").set("Year", 1985)
                 .newRequest().set("Publisher", "Sega").set("Year", "1991...1996")
-                .newRequest().set("Publisher", "Sega").set("Year", "1994").omit();
+                .newRequest().set("Publisher", "Sega").set("Year", 1994).omit();
         FmRequest request = new FmRequest()
                 .findRecords(ENDPOINT, token, LAYOUT_VGSALES, findGames)
                 .build();

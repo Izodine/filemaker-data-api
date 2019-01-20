@@ -16,13 +16,12 @@ public class FmEdit {
     public FmEdit() {
         this.values = new ArrayList<>();
     }
-
     /**
-     * setName
+     * set
      * Create a new Value object with the field name and value and store it it in the values ArrayList
      *
      * @param fieldName  the field name
-     * @param fieldValue the field value
+     * @param fieldValue the string field value
      * @return an FmEdit object with the new edit request value
      */
     public FmEdit set(String fieldName, String fieldValue) {
@@ -33,6 +32,45 @@ public class FmEdit {
             finalFieldValue = fieldValue;
         }
         Value value = new Value(fieldName, finalFieldValue);
+        this.values.add(value);
+        return this;
+    }
+    /**
+     * set
+     * Create a new Value object with the field name and value and store it it in the values ArrayList
+     *
+     * @param fieldName  the field name
+     * @param fieldValue the int field value
+     * @return an FmEdit object with the new edit request value
+     */
+    public FmEdit set(String fieldName, int fieldValue) {
+        Value value = new Value(fieldName, Integer.toString(fieldValue));
+        this.values.add(value);
+        return this;
+    }
+    /**
+     * set
+     * Create a new Value object with the field name and value and store it it in the values ArrayList
+     *
+     * @param fieldName  the field name
+     * @param fieldValue the long field value
+     * @return an FmEdit object with the new edit request value
+     */
+    public FmEdit set(String fieldName, long fieldValue) {
+        Value value = new Value(fieldName, Long.toString(fieldValue));
+        this.values.add(value);
+        return this;
+    }
+    /**
+     * set
+     * Create a new Value object with the field name and value and store it it in the values ArrayList
+     *
+     * @param fieldName  the field name
+     * @param fieldValue the double field value
+     * @return an FmEdit object with the new edit request value
+     */
+    public FmEdit set(String fieldName, double fieldValue) {
+        Value value = new Value(fieldName, Double.toString(fieldValue));
         this.values.add(value);
         return this;
     }

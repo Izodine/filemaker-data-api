@@ -33,10 +33,10 @@ public class FmFind {
     Public setters
     ----------------------------------------------------------------------------------------------*/
     /**
-     * setName
+     * set
      * Set the find request field values
      * @param fieldName  the field name
-     * @param fieldValue the field value
+     * @param fieldValue the field string value
      * @return an FmFind object with the new FindRequest
      */
     public FmFind set(String fieldName, String fieldValue) {
@@ -44,7 +44,42 @@ public class FmFind {
         this.findRequests.get(this.countFoundRequests - 1).set(value);
         return this;
     }
-
+    /**
+     * set
+     * Set the find request field values
+     * @param fieldName  the field name
+     * @param fieldValue the field int value
+     * @return an FmFind object with the new FindRequest
+     */
+    public FmFind set(String fieldName, int fieldValue) {
+        Value value = new Value(fieldName, Integer.toString(fieldValue));
+        this.findRequests.get(this.countFoundRequests - 1).set(value);
+        return this;
+    }
+    /**
+     * set
+     * Set the find request field values
+     * @param fieldName  the field name
+     * @param fieldValue the field double value
+     * @return an FmFind object with the new FindRequest
+     */
+    public FmFind set(String fieldName, double fieldValue) {
+        Value value = new Value(fieldName, Double.toString(fieldValue));
+        this.findRequests.get(this.countFoundRequests - 1).set(value);
+        return this;
+    }
+    /**
+     * set
+     * Set the find request field values
+     * @param fieldName  the field name
+     * @param fieldValue the field long value
+     * @return an FmFind object with the new FindRequest
+     */
+    public FmFind set(String fieldName, long fieldValue) {
+        Value value = new Value(fieldName, Long.toString(fieldValue));
+        this.findRequests.get(this.countFoundRequests - 1).set(value);
+        return this;
+    }
     /**
      * omit
      * Optional method to sets the omit value to true
