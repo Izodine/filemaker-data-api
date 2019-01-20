@@ -132,9 +132,9 @@ This example shows how to to find all the games published by Nintendo in 1985, a
 
 ```java
     FmFind fmFind = new FmFind()
-        .newRequest().set("Publisher", "Nintendo").set("Year", "1985")
+        .newRequest().set("Publisher", "Nintendo").set("Year", 1985)
         .newRequest().set("Publisher", "Sega").set("Year", "1991...1996")
-        .newRequest().set("Publisher", "Sega").set("Year", "1994").omit();
+        .newRequest().set("Publisher", "Sega").set("Year", 1994).omit();
 ```
 Then pass the FmFind object to the FmRequest.findRecords() method.
 ```java
@@ -159,12 +159,12 @@ To set the initial values use the FmEdit class. Set the name of the field and it
 
 ```java
     FmEdit edit = new FmEdit();
-        .set("Rank", "999732")
+        .set("Rank", 999732)
         .set("Name", "Jose's game")
         .set("Publisher", "Lorem ipsum")
         .set("Genre", "Arcade")
         .set("Platform", "Nes")
-        .set("Year", "1981");
+        .set("Year", 1981);
     FmRequest request = new FmRequest()
         .create(url, token, "vgsales", fmEdit)
         .build();
@@ -319,6 +319,7 @@ A class to handle the records that come through a response.
 First, create an `FmData` object while passing an `FmResponse`.
 
 
+
 ```java
     FmData data = new FmData(response);
 ```
@@ -334,10 +335,9 @@ To get the number of records in the data object.
 
 ### getRecord(index)
 
-To get a specified record by it's index position.
+To get a specified record by its index position.
 
 This method returns an FmRecord object, which you will see in the next section.
-
 
 ```java
     FmRecord record = fmData.getRecord(200);
