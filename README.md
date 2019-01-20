@@ -49,7 +49,7 @@ Use this class to create a request object that contains:
 * The information required by the API - like the url, credentials, and body
 * Other optional information created through support classes - like the sort, portal, and script parameters
 
-Complete the request by calling `build()` httpMethod.
+Complete the request by calling `build()` method.
 
 ### login(url, account, password)
 To log in to FileMaker and receive a token
@@ -58,13 +58,13 @@ To use the FileMaker Data API, you must log in with an account that has the fmre
 
 
 ```java
-    // Create a request object, call the login httpMethod, and build it
+    // Create a request object, call the login method, and build it
     FmRequest request = new FmRequest()
             .login(url, account, password)
             .build();
     // Pass the request to Fm.execute() to receive a response
     FmResponse response = Fm.execute(request);
-    // Use the getToken() httpMethod to get the token
+    // Use the getToken() method to get the token
     String token = response.getToken();
 ```
 
@@ -121,7 +121,7 @@ To find records by one or multiple criteria
 Use the FmFind class to easily build complex queries. FmFind has the following methods that you must call in order.
 
 1. `newRequest()` to start a new find request
-2. `set()` to set the field name value pairs (you can call this httpMethod multiple times)
+2. `set()` to set the field name value pairs (you can call this method multiple times)
 3. `omit()` to omit the records (optional: defaults to false)
 
 You can chain the methods to create multiple find requests at once. 
@@ -136,7 +136,7 @@ This example shows how to to find all the games published by Nintendo in 1985, a
         .newRequest().set("Publisher", "Sega").set("Year", "1991...1996")
         .newRequest().set("Publisher", "Sega").set("Year", "1994").omit();
 ```
-Then pass the FmFind object to the FmRequest.findRecords() httpMethod.
+Then pass the FmFind object to the FmRequest.findRecords() method.
 ```java
     FmRequest request = new FmRequest()
         .findRecords(url, token, "vgsales", fmFind)
@@ -154,7 +154,7 @@ To create a blank record
 ### create(url, token, layout, fmEdit)
 To create a record with values
 
-To set the initial values use the FmEdit class. Set the name of the field and its value through the `set()` httpMethod.
+To set the initial values use the FmEdit class. Set the name of the field and its value through the `set()` method.
 
 
 ```java
@@ -173,7 +173,7 @@ To set the initial values use the FmEdit class. Set the name of the field and it
  ### delete(url, token, layout, recordId)
  To delete a record
 
-To delete a record, call the `delete()` httpMethod and pass the record's id.
+To delete a record, call the `delete()` method and pass the record's id.
 
 
 
@@ -183,7 +183,7 @@ To delete a record, call the `delete()` httpMethod and pass the record's id.
         .build();
 ```
 
-Optionally, you can pass an FmScript object through the setScriptParams() httpMethod.
+Optionally, you can pass an FmScript object through the setScriptParams() method.
 
 For example:
 
@@ -199,14 +199,14 @@ For example:
 ___
 
 ## Fm
-The `Fm` class provides a static httpMethod called `execute()` to run a request.
+The `Fm` class provides a static method called `execute()` to run a request.
 
 
 
 ```java
     Fm.execute(request);
 ```    
-The `execute()` httpMethod returns and `FmResponse` object.
+The `execute()` method returns and `FmResponse` object.
 ___
 ## FmResponse
 The `FmResponse` class is used to retrieve the results from the FileMaker Server Data API.
@@ -336,7 +336,7 @@ To get the number of records in the data object.
 
 ### getRecord(index)
 
-To get the specified record pass the record's index position. This httpMethod returns an FmRecord object which you will see in the next section.
+To get the specified record pass the record's index position. This method returns an FmRecord object which you will see in the next section.
 
 
 
@@ -424,7 +424,7 @@ For example:
         .setName("vgsales").setLimit(3).setOffset(1)
         .setName("publishers").setLimit(3).setOffset(1);
 ```
-Then pass the FmPortal object to your FmRequest through the `setPortalParams()` httpMethod.
+Then pass the FmPortal object to your FmRequest through the `setPortalParams()` method.
 ```java
     FmRequest request = new FmRequest()
         .getRecords(url, token, "vgsales")
@@ -443,7 +443,7 @@ First, build an FmSort object and call the `sortAsc()` and `sortDesc()` methods 
         .sortAsc("Genre")
         .sortDesc("Rank");
 ```
-Then, pass it to the FmRequest object through the `sortParams()` httpMethod.
+Then, pass it to the FmRequest object through the `sortParams()` method.
 
 ```java    
     FmRequest request = new FmRequest()
@@ -486,7 +486,7 @@ For example, the VideoGameSales FileMaker databases has a script named log that 
         .setPreSort("log").setPreSortParam("Hello from pre-sort script")
         .setScript("log").setScriptParam("Hello from script")
 ```
-And then pass it to the FmRequest object through the `setScriptParams()` httpMethod.
+And then pass it to the FmRequest object through the `setScriptParams()` method.
 ```java
     FmRequest request = new FmRequest()
         .getRecords(url, token, "vgsales")
@@ -501,7 +501,7 @@ CreationTimestamp	    Message
 01/11/2019 13:44:29	    Hello from script
 ```
 
-The table below shows which requests support the `setScriptParam()` httpMethod.
+The table below shows which requests support the `setScriptParam()` method.
 
 | Request       |  Supports Scripts | 
 |---            |---                |

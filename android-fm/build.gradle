@@ -23,7 +23,6 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
         buildTypes.each {
-            println(isRunningOnTravis)
             if (isRunningOnTravis) {
                 it.buildConfigField 'String', 'API_HOST', '"' + System.getenv("API_HOST") + '"'
                 it.buildConfigField 'String', 'API_ACCOUNT', '"' + System.getenv("API_ACCOUNT") + '"'
@@ -41,6 +40,7 @@ android {
         }
     }
 }
+
 ext {
 
     bintrayRepo = 'maven'

@@ -26,7 +26,13 @@ public class FmEdit {
      * @return an FmEdit object with the new edit request value
      */
     public FmEdit set(String fieldName, String fieldValue) {
-        Value value = new Value(fieldName, fieldValue);
+        String finalFieldValue;
+        if (fieldValue == null) {
+            finalFieldValue = "";
+        } else {
+            finalFieldValue = fieldValue;
+        }
+        Value value = new Value(fieldName, finalFieldValue);
         this.values.add(value);
         return this;
     }
