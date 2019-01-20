@@ -10,9 +10,9 @@ public class FmRequest {
     private static final String EMPTY_BODY = "{}";
     private static final String POST = "POST";
     private static final String DELETE = "DELETE";
-    private final String GET = "GET";
-    private final String BASIC = "Basic";
-    private final String BEARER = "Bearer";
+    private static final String GET = "GET";
+    private static final String BASIC = "Basic";
+    private static final String BEARER = "Bearer";
     private static final String LOGIN = "LOGIN";
     private static final String LOGINOAUTH = "LOGINOAUTH";
     private static final String LOGOUT = "LOGOUT";
@@ -24,27 +24,27 @@ public class FmRequest {
     private static final String LAYOUTS = "/layouts/";
     private static final String RECORDS = "/records";
     private static final String _FIND = "/_find";
-    private boolean disableSSL;
-    private String fmMethod;
     private String endpoint;
-    private int recordId;
     private String httpMethod;
-    private String auth;
+    private String fmMethod;
     private String accountName;
+    private String password;
     private String oAuthRequestId;
     private String oAuthIdentifier;
-    private String password;
-    private String layout;
     private String token;
+    private String auth;
+    private String layout;
     private String limit;
     private String offset;
+    private int recordId;
+    private String body;
     private FmPortal fmPortal;
     private FmSort fmSort;
     private FmScript fmScript;
     private FmFind fmFind;
     private FmEdit fmEdit;
-    private String body;
     private String message;
+    private boolean disableSSL;
 
     public FmRequest() {
         this.disableSSL(false);

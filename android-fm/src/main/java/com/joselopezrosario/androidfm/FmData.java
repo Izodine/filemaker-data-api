@@ -25,6 +25,13 @@ public class FmData {
     Public getters
     ----------------------------------------------------------------------------------------------*/
     /**
+     * getData
+     * @return the JSONArray data object
+     */
+    public JSONArray getData() {
+        return data;
+    }
+    /**
      * size
      * To get the number of records in the data JSONArray
      * @return the number of records
@@ -37,7 +44,6 @@ public class FmData {
             return this.getData().length();
         }
     }
-
     /**
      * getRecord
      * Get the record specified by its index position
@@ -57,7 +63,6 @@ public class FmData {
     public String getError() {
         return error;
     }
-
     /* ---------------------------------------------------------------------------------------------
     Private setters
     ----------------------------------------------------------------------------------------------*/
@@ -95,17 +100,5 @@ public class FmData {
     private void setError(String error){
         this.error = error;
     }
-    /* ---------------------------------------------------------------------------------------------
-    Private getters
-    ----------------------------------------------------------------------------------------------*/
-    /**
-     * getData
-     * @return the JSONArray data object
-     */
-    private JSONArray getData() {
-        return data;
-    }
-
-
 }
 

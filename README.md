@@ -319,7 +319,6 @@ A class to handle the records that come through a response.
 First, create an `FmData` object while passing an `FmResponse`.
 
 
-
 ```java
     FmData data = new FmData(response);
 ```
@@ -329,15 +328,15 @@ First, create an `FmData` object while passing an `FmResponse`.
 To get the number of records in the data object.
 
 
-
 ```java
     int size = data.size();
 ```
 
 ### getRecord(index)
 
-To get the specified record pass the record's index position. This method returns an FmRecord object which you will see in the next section.
+To get a specified record by it's index position.
 
+This method returns an FmRecord object, which you will see in the next section.
 
 
 ```java
@@ -348,8 +347,6 @@ ___
 A class to facilitate parsing an individual record.
 
 First, create an `FmRecord` object while passing the results of `FmData.getRecord()`.
-
-
 
 To create a new object.
 ```java
