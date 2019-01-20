@@ -447,7 +447,6 @@ public class FmRequest {
             String portalLimit = portal.getLimit();
             String portalOffset = portal.getOffset();
             portalNames[i] = "\"" + portalName + "\"";
-            // TODO: This is type 1 concatenation, need to develop type 2
             if (portalLimit != null) {
                 portalOptionalParams = portalOptionalParams.append("&_limit.").append(portalName).append("=").append(portalLimit);
             }
